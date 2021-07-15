@@ -1,0 +1,32 @@
+{
+  "name": "data-block",
+  "version": "1.0.0",
+  "description": "Unified javascript data and business-logic handling utilities wrapped to flexible blocks",
+  "main": "lib/index.js",
+  "scripts": {
+    "test": "jest",
+    "build": "webpack"
+  },
+  "keywords": [
+    "data",
+    "business-logic",
+    "block",
+    "data-block"
+  ],
+  "author": "Ilya Melishnikov",
+  "license": "ISC",
+  "dependencies": {
+    "core-js": "^3.14.0",
+    "lodash": "^4.17.21"
+  },
+  "devDependencies": {
+    "@babel/cli": "^7.14.3",
+    "@babel/core": "^7.14.3",
+    "@babel/preset-env": "^7.14.4",
+    "babel-eslint": "^10.1.0",
+    "babel-jest": "^27.0.2",
+    "babel-preset-jest": "^27.0.1",
+    "eslint": "^7.28.0",
+    "jest": "^27.0.4"
+  }
+}

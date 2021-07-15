@@ -1,0 +1,426 @@
+Типы--------------------------------------------------------
+
+// definition time
+type FieldReducer<ValueType> = (value: ValueType, path: string, newValue: Content, oldValue: Content) => ValueType
+type Scheme = { [x:string]: FieldReducer }
+
+// run time
+type Content = {}
+
+// internal implementation
+
+type Context = {
+	sendMessage: (key: string, data: any) => void,
+	receiveMessage: (key: string, handler: (data: any) => void) => void
+}
+type Position = {
+	path: string
+}
+type MetaData = {
+	position: Position
+}
+
+
+type Renderer = (value: Content, context: Context, ) => Func(value, __internal.context)
+type Func = (value: Content, oldValue: Content, context: Context, meta: MetaData) => Content
+
+Контекст - среда с помощью которой дата блоки могут общаться между собой посредством сообщений.
+	- Контекст бывает один на один блок, при этом он определяется самым корневым дата блоком.
+	- Контекст одинаков для всех вложенных дата блоков
+	- К контексту инстанса дата блока можно подключаться из вне и обрабатывать сообщения контекста
+	- Если при рендере не был передан контекст то дата блок считает себя корневым
+
+type Runner = (
+	scheme: Scheme,
+	newValue: Content,
+	oldValue: Content,
+	context: Context,
+	meta: MetaData
+) => Content
+type __internal = { [x:string]: any } internal state of invoker scope
+
+// public API
+type Content = Object
+
+type DataBlockInstance = (newValue: Content) => Runner(scheme, newValue, __internal.oldValue || initialValue)
+DataBlockInstance.__data_block = true
+
+type DataBlock = (scheme: Scheme, initialValue: Content) => DataBlockInstance
+
+type BlockInstance = (initialValue: Content) => DataBlock(scheme, initialValue)
+BlockInstance.__block = true
+
+type Block = (scheme: Scheme) => BlockInstance
+
+// utils
+type extend = (...args: Array<Block | DataBlock | Scheme>) => Block
+type extendDataBlock = (...args: Array<Block | DataBlock | Scheme>) => DataBlock
+
+type ContentHandler = (dataBlock: DataBlockInstance, handler: (newValue: Content, oldValue: Content) => any) => DataBlock
+type DataBlockHandler = (dataBlock: DataBlock, handler: (newValue: Content, oldValue: Content, instance: DataBlockInstance) => void) => DataBlock
+type BlockNewInstanceHandler = (block: BlockInstance, handler: (value: Content, instance: DataBlock) => void) => Block
+
+const BlockNewInstanceHandler = (blockIntance, handler) => {
+	return (initialValue: Content) => {
+		// new running here
+		const dataBlock = blockInstance(initialValue)
+		handler(dataBlock(initialValue), dataBlock)
+		return dataBlock
+	}
+}
+
+const BlockHandler = (block: Block) => {
+	const createHandlers = []
+	const updateHandlers = []
+
+	const chain = (func) => (...args) => { func(...args); return result; }
+	const handleCreate = chain((cb) => { createHandlers.push(cb) })
+	const handleUpdate = chain((cb) => { updateHandlers.push(cb) })
+
+
+	const build = () => {
+		return (scheme) => {
+			const instance = block(scheme)
+			return (initialValue = {}) => {
+				const dataBlockInstance = instance(scheme, initialValue)
+				let oldValue = initialValue
+				return (...args) => {
+					// TODO: implement block handler
+					const result = dataBlockInstance(...args)
+
+					return result
+				}
+			}
+		}
+	}
+	const result = { handleCreate, handleUpdate, build }
+
+	return result
+}
+// example of usage
+const EmailBlockWithDefaultAddress = DataBlockHandler(EmailBlock).handleUpdate(async (value, { update }) => {
+	if (value.address === 'undefined') {
+		const address = await loadDefaultSystemAddress()
+		update({ adress })
+	}
+}).build()
+
+// examples
+const defaultAddress = 'default-app@mail.com'
+const EmailBlock = Block({
+	address: value(''),
+	isDefault: fields(a => a === defaultAddress, ['address'])
+})
+const EmailDataBlock = EmailBlock({ address: defaultAddress })
+
+const initialValue = EmailDataBlock()
+// here initialValue.isDefault === true
+
+const value = EmailDataBlock({ address: 'example@gmail.com' })
+// here value.isDefault === false
+
+
+
+Реализация------------------------------------------------------------
+
+// help getters
+const isBlock = 		test => typeof test === 'function' && test.__block
+const isDataBlock = 		test => typeof test === 'function' && test.__data_block
+const getDataBlockSchema = 	block => isDataBlock(block) ? block.schema : {}
+
+// extend function
+const extend = (...blocksOrSchemas) => Block(blocksOrSchemas.reduce((acc, blockOrSchema) => {
+	if (isBlock(blockOrSchema))
+		return merge(acc, getDataBlockSchema(blockOrScheme()))
+	if (isDataBlock(blockOrSchema))
+		return merge(acc, getDataBlockSchema(blockOrScheme))
+
+	if (typeof blockOrSchema !== 'object')
+		return acc
+
+	return merge(acc, blokcOrSchema)
+}, {}))
+// example of usage
+const ExtendedEmailBlock = extend(EmailBlock, NewAppEmailBlock, { appContext: option('default', ['default', 'extended']) })
+
+// content handler
+const ContentHandler = (dataBlock, handler) => {
+	let oldContent = {}
+	return => (newValue) => {
+		const newContent = dataBlock(newValue)
+
+		dataBlock.__content_handlers[handler.name] = handler(newContent, oldContent)
+
+		oldContent = newContent
+		return newContent
+	}
+}
+
+// example of usage
+const changes = (...fields: Array<string>) => (newContent, oldContent) => {
+	return calcDiff(newContent, oldContent, fields)
+}
+
+const EmailBlockWithChanges = ContentHandler(EmailBlock(), changes('address'))
+const initialValue = EmailBlockWithChanges()
+const value = EmailBlockWithChanges({ address: 's@s.com' })
+EmailBlockWithChanges.content.changes().has('address', () => {})
+
+
+const updateCalendar = (newValue, oldValue) => {
+	if (newValue.id !== oldValue.id)
+		emitter.send(updateCalendar, oldValue.id, newValue.id)
+}
+const autoUpdateEmailBlock = ContentHandler(EmailBlock(), updateCalendar)
+
+// data block update handler
+opt1. const DataBlockUpdateHandler = (dataBlock, handler) => {
+	this.emitter = new EventEmitter()
+	this.onUpdate = () => {}
+
+	const emitUpdate = (newValue) => {
+		this.emitter.send('update', newValue)
+	}
+
+	const updateRunner = (instance) => {
+		let oldValue = {}
+		return (newValue) => {
+			// update of data block is running here
+			const newContent = instance(newValue)
+
+			handler(newContent, oldValue, { update: (newValue) => { oldValue = instance(merge({}, oldValue, newValue)); emitUpdate(oldValue); } })
+
+			oldValue = newContent
+			return newContent
+		}
+	}
+
+	// monkey patch and return our renderer
+	return (scheme, initialValue) => {
+		const instance = dataBlock(scheme, initialValue)
+		return updateRunner(instance)
+	}
+}
+
+opt2. const DataBlockUpdateHandler = () => {
+
+}
+
+
+
+const EmailBlockWithDefaultAddress = DataBlockUpdateHandler(EmailBlock, async (value, { update }) => {
+	if (value.address === undefined) {
+		const address = await loadDefaultSystemAddress()
+		update({ address })
+	}
+})
+const instance = EmailBlockWithDefaultAddress()
+instance.onUpdate(doStuff)
+
+<Form block={instance} />
+
+
+
+
+
+
+// experimental API
+Context(DataBlock({ a: DataBlock }))
+
+Block(
+	DataBlock({ a: DataBlock })
+)
+
+const setContext = (dataBlock, context) => {
+	dataBlock.__add_meta('context', context)
+}
+
+type ContextParams = () => Object
+
+const Block = (scheme, contextParams) => {
+	Block.__block_context_params = contextParams
+
+	return (initialValue) => {
+		const ctx = createCtx(contextParams())
+		const instance = DataBlock(scheme, initialValue)
+		setContext(instance, ctx)
+
+		return instance
+	}
+}
+
+const EmailBlock = Block(
+	{ address: value() },
+	() => ({ })
+)
+const master = Block(
+	{
+		userId: value((_, ctx) => ctx.userId),
+		email: EmailBlock
+	},
+	() => ({ userId })
+)
+
+
+
+
+
+
+
+const UpdateHandler = (block) => {
+	const updateBlock = Block(block, block.__block_context_params)
+
+	return updateBlock
+}
+
+
+// experimental light-weight lang
+const defaultId = -1
+
+block EmailBlock:
+	id: value(defaultId)
+	address: value('example@gmail.com')
+
+block User:
+	id: value(defaultId)
+	email: EmailBlock
+	errors: value()
+
+
+handler AutoUser -> Updates<User>:
+	onUpdate: async ({ email: { address } }, update) => {
+		const haveInSystem = await api.checkAddress(address)
+		if (haveInSystem) {
+			updateField('errors', { email: { address: 'Already exists in the system' } })
+		}
+	}
+
+handler AutoUser2 -> Updates<AutoUser>:
+	onUpdate: () => {}
+
+
+
+const autoUser = UpdatesHandler(User, { onUpdate })
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Теория -----------------------------------------------------
+
+Определения:
+Раннер - функция которая проходит через все поля схемы и применяет редьюсеры с текущим значением,
+	после чего взвращает новое валидное состояние для экземпляра DataBlock
+Контент - результат работы раннера, а так же новое и старое значение для вычисление результата раннера,
+	должны иметь один и тот же тип
+
+Дата блок - функция которая предоставляет сконфигурированный раннер для данных
+Блок - функция которая предоставляет сконфигурированные дата блоки
+
+Метаданные рана - произвольные данные которые вычилсяются после каждого рана блока
+Обработчик контента - функция которая вызывается после отрисовки в дата блоке нового значения и возвращает некоторые мета данные рана
+Обработчик дата блока - функция которая вызвается при обновлении дата блока
+Обработчик блока - функция которая вызывается при создании дата блоков
+
+Флоу создания:
+1. Создается экземпляр фабрики раннеров - Block = Factory<DataBlock>
+2. Каждый (DataBlock) независимый от других блоков поражденных фабрикой (Block)
+3. Каждый (DataBlock) имеет одинаковую схему указанную один раз при объявлении блока (Block)
+
+Флоу обновления DataBlock:
+1. Во время создания DataBlock можно указать пре-инициализированное состояние контента,
+	которое будет использоваться как текущее состояние раннера при первом запуске.
+	Таким образом чтобы отрисовать пре-инициализированное состояние нужно запустить
+	раннер сразу после создание дата блока с newValue=undefined
+2. Чтобы вернуть обновленное состояние, нужно вызвать раннер с указанием обновленного состояния,
+	после чего ранер запустит все редьюсеры с новыми значениями
+
+Флоу расщирения блоков:
+1. Блоки могут быть расширены другими блоками, в таком случае блоки сливают свои схемы в одну и
+	создают одну общую схему, и создается независимый блок с этой новой схемой.
+	При этом старые блоки никак не изменяются.
+2. Блоки могут быть расширены:
+	блоками
+	дата блоками
+	схемами
+
+	В любом количестве и порядке
+3. Для расширения блоков исползьзуется функция extend
+
+Флоу обработчика контента
+1. Обработчик контента (ContentHandler) может быть присоеденен или удален из data block в любое время с помощью функции addContentHandler
+2. Обработчик контента запускается после кажого рана data block и добавляет произвольные метаданные к контенту
+3. В функцию для вычисления передается два аргумента oldValue и newValue
+
+
+Флоу отслеживания изменений
+1. После того как будет создан DataBlock, можно просматривать какие поля были изменены с помощью обработчика контента changes
+
+Флоу обработки обновления
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
