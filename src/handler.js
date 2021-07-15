@@ -1,16 +1,16 @@
 // export type Render = (Object) => Object
 
-// export type PartialContext = (selfRender: Render) => ContextInstance
+// export type PartialHandler = (selfRender: Render) => HandlerInstance
 
-// export type ContextInstance = {
+// export type HandlerInstance = {
 //   getPath: () => string,
-//   wrapParentContext: (parent: ContextInstance, path: string) => void,
+//   wrapParentHandler: (parent: HandlerInstance, path: string) => void,
 //   invoke: (newValue: Object, oldValue: Object) => void
 // }
 
-export const createCtxFactory = (contextHandler) => {
-  // returns partial context instance
-  // for connect to parent context partial context
+export const createHandlerFactory = (handlerFn) => {
+  // returns partial handler instance
+  // for connect to parent partial handler
   return (selfRender) => {
     let parentCtxInstance
     let pathToBlock
@@ -28,14 +28,14 @@ export const createCtxFactory = (contextHandler) => {
 
       getPath: () => pathToBlock,
 
-      wrapParentContext(parentContextInstance, path) {
-        parentCtxInstance = parentContextInstance
+      wrapParentHandler(parentHandlerInstance, path) {
+        parentCtxInstance = parentHandlerInstance
         pathToBlock = path
       },
 
       invoke(value, oldValue) {
         updatedValue = value
-        contextHandler && contextHandler(value, update, oldValue)
+        handlerFn && handlerFn(value, update, oldValue)
 
         return updatedValue
       },

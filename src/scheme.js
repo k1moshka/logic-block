@@ -7,7 +7,7 @@ export const isDataBlock = test => test.__data_block === true
 
 export const buildPath = (...args) => args.filter(Boolean).join('.')
 
-export const SchemeRenderer = (scheme, initialValue, contextInstance) => {
+export const SchemeRenderer = (scheme, initialValue, handlerInstance) => {
   // redering time code
 
   return (newValue, oldValue, path) => {
@@ -25,7 +25,7 @@ export const SchemeRenderer = (scheme, initialValue, contextInstance) => {
             const fullPath = buildPath(path, basePath, key)
             const partialNewValue = getPath(newValue, fullPath)
             const partialOldValue = getPath(oldValue, fullPath)
-            result[key] = entry(partialOldValue)(partialNewValue, fullPath, contextInstance)
+            result[key] = entry(partialOldValue)(partialNewValue, fullPath, handlerInstance)
           } else {
             result[key] = entry()
           }

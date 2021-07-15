@@ -136,8 +136,8 @@ describe('Block instance options', () => {
   })
 })
 
-describe('Block context', () => {
-  test('Block context works properly', () => {
+describe('Block handler', () => {
+  test('Block handler works properly', () => {
     const fn = jest.fn(() => {})
     const block = Block({
       a: value(1),
@@ -160,7 +160,7 @@ describe('Block context', () => {
     expect(fn.mock.calls[2][2]).toEqual({ a: 1, b: 2 }) // oldValue
   })
 
-  test('Block context sync update works properly', () => {
+  test('Block handler sync update works properly', () => {
     const block = Block({
       a: value(1),
       b: value(2)
@@ -183,7 +183,7 @@ describe('Block context', () => {
   })
 
 
-  test('Block context async update works properly', async () => {
+  test('Block handler async update works properly', async () => {
     await new Promise((resolve) => {
       let updated = false
       const block = Block({
@@ -199,7 +199,7 @@ describe('Block context', () => {
       const instance = block(undefined, { handleUpdate: fn })
       instance()
 
-      const result = instance({ a: 3 }) // here we run async update in context
+      const result = instance({ a: 3 }) // here we run async update in handler
       expect(result).toEqual({ a: 3, b: 2 })
       expect(fn.mock.calls[0][0]).toEqual({ a: 3, b: 2 })
 
@@ -209,7 +209,7 @@ describe('Block context', () => {
   })
 
 
-  test('Nested block context works properly', () => {
+  test('Nested block handler works properly', () => {
     const fn = jest.fn(() => {})
     const ctxBlock = Block({
       a: value(1),
@@ -236,7 +236,7 @@ describe('Block context', () => {
     expect(fn.mock.calls[2][2]).toEqual({ a: 1, b: 2 }) // oldValue
   })
 
-  test('Nested block context can update the whole block', () => {
+  test('Nested block handler can update the whole block', () => {
     const ctxBlock = Block({
       a: value(1),
       b: value(2)
