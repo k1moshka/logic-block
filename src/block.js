@@ -5,7 +5,7 @@ import { createHandlerFactory } from './handler'
 import { SchemeRenderer } from './scheme'
 
 export const Block = (scheme, handlerFn) => {
-  // контекст это обработчик который определяется на стадии определения блока
+  // handlerFn это обработчик который определяется на стадии определения блока
   let handlerFactory
   if (typeof handlerFn === 'function') {
     handlerFactory = createHandlerFactory(handlerFn)
@@ -14,20 +14,19 @@ export const Block = (scheme, handlerFn) => {
   }
 
 
-  const blockInstance = (initialValue, options = {}) => {
-    // ctx - это инстанс котекста, который может запускать обработчик при рендере
+  const blockFactory = (initialValue, options = {}) => {
     const { handleUpdate, handleChanges } = options
     const changesDetector = typeof handleChanges === 'function'
       && createChangesInstance(handleChanges)
 
-    const handlerInstance = handlerFactory(DataBlock)
+    const handlerInstance = handlerFactory(BlockInstance)
 
     const renderScheme = SchemeRenderer(scheme, initialValue, handlerInstance)
 
     let currentValue = initialValue
     let isInitialRender = true
 
-    function DataBlock(newValue = initialValue, path, parentHandlerInstance) {
+    function BlockInstance(newValue = initialValue, path, parentHandlerInstance) {
       // parentHandler - это инстанс хэндлера родителя
       handlerInstance.wrapParentHandler(parentHandlerInstance, path)
 
@@ -46,13 +45,13 @@ export const Block = (scheme, handlerFn) => {
 
       return executedResult
     }
-    DataBlock.__data_block = true
+    BlockInstance.__data_block = true
 
-    return DataBlock
+    return BlockInstance
   }
-  blockInstance.__getScheme = () => merge({}, scheme)
-  blockInstance.__block = true
+  blockFactory.__getScheme = () => merge({}, scheme)
+  blockFactory.__block = true
 
 
-  return blockInstance
+  return blockFactory
 }
