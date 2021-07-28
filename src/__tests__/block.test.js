@@ -258,8 +258,8 @@ describe('Block handler', () => {
     expect(result).toEqual({ ctx: { a: 4, b: 100 } })
   })
 
-  test('Really deep nested blocks with updates', () => {
-    // TODO: implement it
-  })
+  // TODO: implement it
+  // test('Really deep nested blocks with updates', () => {
+  // })
 
 })
