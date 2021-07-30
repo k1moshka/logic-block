@@ -2,10 +2,8 @@ import getPath from 'lodash/get'
 import setPath from 'lodash/set'
 import merge from 'lodash/merge'
 
-
-export const isFieldReducer = test => test.__field_reducer === true
-export const isBlock = test => test.__block === true
-export const isDataBlock = test => test.__data_block === true
+import { isBlock } from '../block'
+import { isFieldReducer } from '../createFieldReducer'
 
 const buildPath = (...args) => args.filter(Boolean).join('.')
 

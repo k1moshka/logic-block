@@ -40,4 +40,25 @@ describe('memoHandler works as expected', () => {
     expect(fn.mock.calls.length).toBe(2)
   })
 
+  test('memo handler can update properly', () => {
+    const fn = jest.fn((a, update, { b }) => {
+      if (a) {
+        update({ b: b + 1 })
+      }
+    })
+    const block = Block({
+      a: value(false),
+      b: value(1)
+    }, memoHandler(fn, ['a']))
+
+    const instance = block()
+    instance()
+    instance({ a: true })
+    instance({ a: false })
+    const result = instance({ a: true }) // run here
+
+    expect(result).toEqual({ a: true, b: 3 })
+    expect(fn.mock.calls.length).toBe(4)
+  })
+
 })

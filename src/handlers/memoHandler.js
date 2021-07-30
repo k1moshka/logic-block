@@ -8,7 +8,7 @@ export default function memoHandler(fn, fields) {
     }, false)
 
     if (anyFieldsWasChanged) {
-      fn(...fields.map(fld => getPath(value, fld)), update, value)
+      fn(...fields.map(fld => getPath(value, fld)), update, value, oldValue)
     }
   })
 }

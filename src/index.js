@@ -1,4 +1,5 @@
 export { Block as default } from './block'
+export * from './block'
 
 export * from './createFieldReducer'
 export * from './reducers'

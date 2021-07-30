@@ -5,7 +5,6 @@ import { createFieldReducer } from '../createFieldReducer'
 import { createHandler } from '../handler'
 import { value } from '../reducers'
 
-
 describe('Block rendering', () => {
   test('do values setups immediately while processing new value from scheme', () => {
     const fn = jest.fn(() => { return 1 })
@@ -89,50 +88,7 @@ describe('Block updating', () => {
 })
 
 describe('Block instance options', () => {
-  test('Block handleChanges works well', () => {
-    const fnHas = jest.fn(() => {})
-    const fnHasAny = jest.fn(() => {})
-    const fnHasAll = jest.fn(() => {})
-
-    const block = Block({
-      a: value(1),
-      b: value(2)
-    })
-    const instance = block(undefined, {
-      handleChanges: ({ has }) => {
-        has('a', fnHas)
-          .hasAny('a', 'b', fnHasAny)
-          .hasAll('a', 'b', fnHasAll)
-      }
-    })
-
-    instance()
-    expect(fnHas.mock.calls.length).toBe(0)
-    expect(fnHasAny.mock.calls.length).toBe(0)
-    expect(fnHasAll.mock.calls.length).toBe(0)
-
-    instance({ a: 2 })
-    expect(fnHas.mock.calls.length).toBe(1)
-    expect(fnHasAny.mock.calls.length).toBe(1)
-    expect(fnHasAll.mock.calls.length).toBe(0)
-
-    instance({ b: 3 })
-    expect(fnHas.mock.calls.length).toBe(1)
-    expect(fnHasAny.mock.calls.length).toBe(2)
-    expect(fnHasAll.mock.calls.length).toBe(0)
-
-    instance({ b: 3 })
-    expect(fnHas.mock.calls.length).toBe(1)
-    expect(fnHasAny.mock.calls.length).toBe(2)
-    expect(fnHasAll.mock.calls.length).toBe(0)
-
-    instance({ a: 4, b: 5 })
-    expect(fnHas.mock.calls.length).toBe(2)
-    expect(fnHasAny.mock.calls.length).toBe(3)
-    expect(fnHasAll.mock.calls.length).toBe(1)
-  })
-
-  test('Block handleChanges works well', () => {
+  test('Block handleUpdate works well', () => {
     const block = Block({
       a: value(1),
       b: value(2)
