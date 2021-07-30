@@ -11,6 +11,7 @@ const buildPath = (...args) => args.filter(Boolean).join('.')
 
 export const SchemeRenderer = (scheme, initialValue, handlerInstance) => {
   // redering time code
+  const blocks = {}
 
   return (newValue, oldValue, path) => {
     const result = merge({}, oldValue, newValue)
@@ -26,9 +27,13 @@ export const SchemeRenderer = (scheme, initialValue, handlerInstance) => {
             setPath(result, fullPath, entry(result, oldValue, fullPath))
 
           } else if (isBlock(entry)) {
+            if (!blocks[fullPath]) {
+              const partialOldValue = getPath(oldValue, fullPath)
+              blocks[fullPath] = entry(partialOldValue)
+            }
+
             const partialNewValue = getPath(result, fullPath)
-            const partialOldValue = getPath(oldValue, fullPath)
-            setPath(result, fullPath, entry(partialOldValue)(partialNewValue, fullPath, handlerInstance))
+            setPath(result, fullPath, blocks[fullPath](partialNewValue, fullPath, handlerInstance))
 
           } else {
             setPath(result, fullPath, entry())

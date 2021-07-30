@@ -1,4 +1,4 @@
-import Block, { value, createHandler } from '../'
+import Block, { value, createHandler, wrapHandler } from '../'
 
 describe('handler works properly', () => {
   test('handler can get value', () => {
@@ -34,5 +34,26 @@ describe('handler works properly', () => {
     expect(handler.mock.calls.length).toBe(2)
     expect(handler.mock.calls[0][0]).toEqual({ a: 1 })
     expect(handler.mock.calls[1][0]).toEqual({ a: 2 })
+  })
+
+  test('handler in nested block should create only once', () => {
+    const updateFn = jest.fn(() => { })
+    const fn = jest.fn(() => updateFn)
+
+    const block = Block({
+      a: Block({
+        b: value(1)
+      }, wrapHandler(fn))
+    })
+    const instance = block()
+
+    instance()
+    instance({ a: { b: 2 } })
+    instance({ a: { b: 3 } })
+    instance({ a: { b: 4 } })
+    instance({ a: { b: 5 } })
+
+    expect(updateFn.mock.calls.length).toBe(5)
+    expect(fn.mock.calls.length).toBe(1)
   })
 })
