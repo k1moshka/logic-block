@@ -1,8 +1,8 @@
 import merge from 'lodash/merge'
 
-import { createChangesInstance } from './changes'
-import { createHandlerFactory } from './handler'
-import { SchemeRenderer } from './scheme'
+import { createChangesInstance } from './internal/changes'
+import { SchemeRenderer } from './internal/scheme'
+import { createHandlerFactory } from './internal/createHandlerFactory'
 
 export const Block = (scheme, handlerFn) => {
   // handlerFn это обработчик который определяется на стадии определения блока

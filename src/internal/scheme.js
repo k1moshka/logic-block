@@ -7,7 +7,7 @@ export const isFieldReducer = test => test.__field_reducer === true
 export const isBlock = test => test.__block === true
 export const isDataBlock = test => test.__data_block === true
 
-export const buildPath = (...args) => args.filter(Boolean).join('.')
+const buildPath = (...args) => args.filter(Boolean).join('.')
 
 export const SchemeRenderer = (scheme, initialValue, handlerInstance) => {
   // redering time code
