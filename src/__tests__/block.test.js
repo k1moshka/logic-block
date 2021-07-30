@@ -1,9 +1,28 @@
+import getPath from 'lodash/get'
+
 import { Block } from '../block'
 import { createFieldReducer } from '../createFieldReducer'
 import { value } from '../reducers'
 
 
 describe('Block rendering', () => {
+  test('do values setups immediately while processing new value from scheme', () => {
+    const fn = jest.fn(() => { return 1 })
+    const block = Block({
+      a: {
+        b: value([]),
+        c: value(fn)
+      }
+    })
+    const instance = block()
+    const result = instance()
+
+    expect(fn.mock.calls[0][0]).toEqual({
+      a: expect.objectContaining({ b: [] })
+    })
+    expect(result).toEqual({ a: { b: [], c: 1 } })
+  })
+
   test('Block renders properly', () => {
     const block = Block({
       a: 1,
@@ -33,17 +52,17 @@ describe('Block rendering', () => {
 
 describe('Block updating', () => {
   test('Block update works properly', () => {
-    const reducerFn = jest.fn((fieldValue) => fieldValue)
+    const reducerFn = jest.fn((value, oldValue, path) => getPath(value, path))
     const block = Block({ a: createFieldReducer(reducerFn) })
 
     const instance = block()
     let result = instance()
-    expect(result).toEqual({ a: {} })
+    expect(result).toEqual({ a: undefined })
 
     result = instance({ a: 16 })
-    expect(result).toEqual({ a: { a: 16 } })
+    expect(result).toEqual({ a: 16 })
     expect(reducerFn.mock.calls[1][0]).toEqual({ a: 16 }) // newValue
-    expect(reducerFn.mock.calls[1][1]).toEqual({ a: {} }) // oldValue
+    expect(reducerFn.mock.calls[1][1]).toEqual({ a: undefined }) // oldValue
     expect(reducerFn.mock.calls[1][2]).toBe('a') // path
   })
 

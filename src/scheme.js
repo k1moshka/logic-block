@@ -1,4 +1,6 @@
 import getPath from 'lodash/get'
+import setPath from 'lodash/set'
+import merge from 'lodash/merge'
 
 
 export const isFieldReducer = test => test.__field_reducer === true
@@ -11,37 +13,39 @@ export const SchemeRenderer = (scheme, initialValue, handlerInstance) => {
   // redering time code
 
   return (newValue, oldValue, path) => {
+    const result = merge({}, oldValue, newValue)
 
     const renderSchemePart = (part, basePath) => {
-      return Object.keys(part).reduce((result, key) => {
+      for (const key of Object.keys(part)) {
         const entry = part[key]
+        const fullPath = buildPath(path, basePath, key)
 
         if (typeof entry === 'function') {
 
           if (isFieldReducer(entry)) {
-            const fullPath = buildPath(path, basePath, key)
-            result[key] = entry(newValue, oldValue, fullPath)
+            setPath(result, fullPath, entry(result, oldValue, fullPath))
+
           } else if (isBlock(entry)) {
-            const fullPath = buildPath(path, basePath, key)
-            const partialNewValue = getPath(newValue, fullPath)
+            const partialNewValue = getPath(result, fullPath)
             const partialOldValue = getPath(oldValue, fullPath)
-            result[key] = entry(partialOldValue)(partialNewValue, fullPath, handlerInstance)
+            setPath(result, fullPath, entry(partialOldValue)(partialNewValue, fullPath, handlerInstance))
+
           } else {
-            result[key] = entry()
+            setPath(result, fullPath, entry())
           }
 
         } else if (typeof entry === 'object') {
 
-          result[key] = renderSchemePart(entry, key)
+          renderSchemePart(entry, key)
 
         } else {
-          result[key] = entry
+          setPath(result, fullPath, entry)
         }
-
-        return result
-      }, {})
+      }
     }
 
-    return renderSchemePart(scheme)
+    renderSchemePart(scheme)
+
+    return result
   }
 }
