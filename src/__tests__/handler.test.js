@@ -1,11 +1,11 @@
-import Block, { value } from '../'
+import Block, { value, createHandler } from '../'
 
 describe('handler works properly', () => {
   test('handler can get value', () => {
     const handler = jest.fn(() => {})
     const block = Block({
       a: value(1)
-    }, handler)
+    }, createHandler(handler))
 
     const instance = block()
 
@@ -25,7 +25,7 @@ describe('handler works properly', () => {
     })
     const block = Block({
       a: value(1)
-    }, handler)
+    }, createHandler(handler))
 
     const instance = block()
 

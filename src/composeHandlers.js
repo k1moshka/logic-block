@@ -1,34 +1,42 @@
-export function composeChainHandlers(...handlers) {
-  let nextValue = undefined
-  let prevValue = undefined
+import { isHandler, wrapHandler } from './handler'
 
-  return (value, update, oldValue) => {
-    nextValue = value
-    prevValue = oldValue || prevValue
+export function composeChainHandlers(...handlersOrFunctions) {
+  return wrapHandler(() => {
+    let nextValue = undefined
+    let prevValue = undefined
 
-    let breakChain = false
+    return (value, update, oldValue) => {
+      nextValue = value
+      prevValue = oldValue || prevValue
 
-    const patchedUpdate = (newValue) => {
-      prevValue = nextValue
-      nextValue = update(newValue)
+      let breakChain = false
 
-      breakChain = true
-    }
+      const patchedUpdate = (newValue) => {
+        prevValue = nextValue
+        nextValue = update(newValue)
 
-    for (let handler of handlers) {
-      handler(nextValue, patchedUpdate, prevValue)
+        breakChain = true
+      }
 
-      if (breakChain) {
-        return
+      for (let handler of handlersOrFunctions) {
+        handler(nextValue, patchedUpdate, prevValue)
+
+        if (breakChain) {
+          return
+        }
       }
     }
-  }
+  })
 }
 
-export default function composeHandlers(...handlers) {
-  return (...args) => {
-    for (let handler of handlers) {
-      handler(...args)
+export default function composeHandlers(...handlersOrFunctions) {
+  return wrapHandler(() => {
+    const handlers = handlersOrFunctions.map(h => isHandler(h) ? h() : h)
+
+    return (...args) => {
+      for (let handler of handlers) {
+        handler(...args)
+      }
     }
-  }
+  })
 }

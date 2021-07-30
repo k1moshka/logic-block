@@ -2,6 +2,7 @@ import getPath from 'lodash/get'
 
 import { Block } from '../block'
 import { createFieldReducer } from '../createFieldReducer'
+import { createHandler } from '../handler'
 import { value } from '../reducers'
 
 
@@ -161,7 +162,7 @@ describe('Block handler', () => {
     const block = Block({
       a: value(1),
       b: value(2)
-    }, fn)
+    }, createHandler(fn))
 
     const instance = block()
     expect(fn.mock.calls.length).toBe(0)
@@ -183,11 +184,11 @@ describe('Block handler', () => {
     const block = Block({
       a: value(1),
       b: value(2)
-    }, ({ a }, update) => {
+    }, createHandler(({ a }, update) => {
       if (a === 3) {
         update({ a: 4, b: 100 })
       }
-    })
+    }))
 
     const fn = jest.fn(() => { })
     const instance = block(undefined, { handleUpdate: fn })
@@ -208,11 +209,11 @@ describe('Block handler', () => {
       const block = Block({
         a: value(1),
         b: value(2)
-      }, ({ a }, update) => {
+      }, createHandler(({ a }, update) => {
         if (a === 3) {
           setTimeout(() => { updated = true; update({ a: 4, b: 100 }) }, 1000)
         }
-      })
+      }))
 
       const fn = jest.fn(({ a }) => { if (a === 4 && updated) { resolve() } })
       const instance = block(undefined, { handleUpdate: fn })
@@ -233,7 +234,7 @@ describe('Block handler', () => {
     const ctxBlock = Block({
       a: value(1),
       b: value(2)
-    }, fn)
+    }, createHandler(fn))
     const block = Block({
       ctx: ctxBlock
     })
@@ -259,11 +260,11 @@ describe('Block handler', () => {
     const ctxBlock = Block({
       a: value(1),
       b: value(2)
-    }, ({ a }, update) => {
+    }, createHandler(({ a }, update) => {
       if (a === 3) {
         update({ a: 4, b: 100 })
       }
-    })
+    }))
 
     const block = Block({
       ctx: ctxBlock

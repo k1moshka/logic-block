@@ -1,22 +1,41 @@
-// export type Render = (Object) => Object
+import setPath from 'lodash/set'
 
-// export type PartialHandler = (selfRender: Render) => HandlerInstance
+export type Render = (partialUpdatedValues: Object) => Object
 
-// export type HandlerInstance = {
-//   getPath: () => string,
-//   wrapParentHandler: (parent: HandlerInstance, path: string) => void,
-//   invoke: (newValue: Object, oldValue: Object) => void
-// }
+export type PartialHandler = (selfRender: Render) => HandlerInstance
 
-export const createHandlerFactory = (handlerFn) => {
+export type HandlerInstance = {
+  getPath: () => string,
+  wrapParentHandler: (parent: HandlerInstance, path: string) => void,
+  invoke: (newValue: Object, oldValue: Object) => Object,
+  updateWithValue: (path: string, valueAtPath: Object) => Object
+}
+
+export type HandlerFunction = (value: Object, update: Function, oldValue: Object) => {}
+export type BlockHandler = () => HandlerFunction
+
+export const isHandler = test => test.__block_handler === true
+
+export const wrapHandler = (handler: BlockHandler): BlockHandler => {
+  handler.__block_handler = true
+
+  return handler
+}
+
+export const createHandler = (fn: HandlerFunction): BlockHandler => wrapHandler(() => fn)
+
+
+export const createHandlerFactory = (handler: BlockHandler) => {
   // returns partial handler instance
   // for connect to parent partial handler
   return (selfRender) => {
+    const handlerFn = handler()
+
     let parentCtxInstance
     let pathToBlock
     let updatedValue
 
-    const update = (newValue) => {
+    const update = (newValue: Object): Object => {
       updatedValue = selfRender(newValue, pathToBlock, parentCtxInstance)
 
       if (parentCtxInstance) {
@@ -28,22 +47,22 @@ export const createHandlerFactory = (handlerFn) => {
 
     return {
 
-      getPath: () => pathToBlock,
+      getPath: (): string => pathToBlock,
 
-      wrapParentHandler(parentHandlerInstance, path) {
+      wrapParentHandler(parentHandlerInstance: HandlerInstance, path: string) {
         parentCtxInstance = parentHandlerInstance
         pathToBlock = path
       },
 
-      invoke(value, oldValue) {
+      invoke(value: Object, oldValue: Object): Object {
         updatedValue = value
         handlerFn && handlerFn(value, update, oldValue)
 
         return updatedValue
       },
 
-      updateWithValue(path, valueAtPath) {
-        return update({ [path]: valueAtPath })
+      updateWithValue(path: string, valueAtPath: Object): Object {
+        return update(setPath({}, path, valueAtPath))
       }
 
     }

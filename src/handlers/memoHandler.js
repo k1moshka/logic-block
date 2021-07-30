@@ -1,7 +1,8 @@
 import getPath from 'lodash/get'
+import { wrapHandler } from '../handler'
 
 export default function memoHandler(fn, fields) {
-  return (value, update, oldValue) => {
+  return wrapHandler(() => (value, update, oldValue) => {
     const anyFieldsWasChanged = fields.reduce((acc, fld) => {
       return acc || getPath(value, fld) !== getPath(oldValue, fld)
     }, false)
@@ -9,5 +10,5 @@ export default function memoHandler(fn, fields) {
     if (anyFieldsWasChanged) {
       fn(...fields.map(fld => getPath(value, fld)), update, value)
     }
-  }
+  })
 }
