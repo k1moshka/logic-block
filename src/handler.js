@@ -20,7 +20,7 @@ export const createHandlerFactory = (handlerFn) => {
       updatedValue = selfRender(newValue, pathToBlock, parentCtxInstance)
 
       if (parentCtxInstance) {
-        return parentCtxInstance.updateWithValue(pathToBlock, updatedValue)
+        parentCtxInstance.updateWithValue(pathToBlock, updatedValue)
       }
 
       return updatedValue
@@ -43,7 +43,7 @@ export const createHandlerFactory = (handlerFn) => {
       },
 
       updateWithValue(path, valueAtPath) {
-        update({ [path]: valueAtPath })
+        return update({ [path]: valueAtPath })
       }
 
     }
