@@ -61,4 +61,23 @@ describe('memoHandler works as expected', () => {
     expect(fn.mock.calls.length).toBe(4)
   })
 
+  test('memo handler in nested block works well', () => {
+
+    const block = Block({
+      a: Block({
+        b: value(false),
+        c: value(1)
+      }, memoHandler((b, update) => {
+        if (b) {
+          update({ c: 2 })
+        }
+      }, ['b']), 'nested')
+    }, undefined, 'outer')
+
+    const instance = block()
+    const result = instance({ a: { b: true } })
+
+    expect(result).toEqual({ a: { b: true, c: 2 } })
+  })
+
 })

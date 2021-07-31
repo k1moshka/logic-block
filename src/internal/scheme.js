@@ -8,7 +8,7 @@ import { isFieldReducer } from '../createFieldReducer'
 const buildPath = (...args) => args.filter(Boolean).join('.')
 
 export const SchemeRenderer = (scheme, initialValue, handlerInstance) => {
-  // redering time code
+  // rendering time code
   const blocks = {}
 
   return (newValue, oldValue, path) => {

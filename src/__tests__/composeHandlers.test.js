@@ -19,7 +19,11 @@ describe('composeHandlers works properly', () => {
     const fn3 = jest.fn(() => { })
 
 
-    const block = Block({ a: value(1) }, composeHandlers(memoHandler(fn1, ['a']), fn2, fn3))
+    const block = Block({ a: value(1) }, composeHandlers(
+      memoHandler(fn1, ['a']),
+      fn2,
+      fn3
+    ))
     const instance = block()
 
     const result = instance()

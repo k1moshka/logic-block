@@ -28,16 +28,20 @@ export const Block = (scheme, handlerFn) => {
     const renderScheme = SchemeRenderer(scheme, initialValue, handlerInstance)
 
     let currentValue = initialValue
-    let handlerStashValue
+    let handlerOldValue
     let isInitialRender = true
 
     function HandlerRenderer(newValue = initialValue, path, parentHandlerInstance) {
-      if (handlerStashValue) {
-        return renderScheme(merge({}, handlerStashValue, newValue))
+      let result
+      if (handlerOldValue) {
+        result = renderScheme(merge({}, handlerOldValue, newValue))
+      } else {
+        // if not, means that update was invoked async
+        result = BlockInstance(newValue, path, parentHandlerInstance)
       }
 
-      // if not, means that update was invoked async
-      BlockInstance(newValue, path, parentHandlerInstance)
+      currentValue = handlerOldValue
+      return result
     }
 
     function BlockInstance(newValue = initialValue, path, parentHandlerInstance) {
@@ -50,14 +54,13 @@ export const Block = (scheme, handlerFn) => {
       let step = 0
       // eslint-disable-next-line no-constant-condition
       while (true) {
-        handlerStashValue = result
+        handlerOldValue = result
 
         const executedResult = handlerInstance.invoke(result, currentValue)
         const valueIsNotChanged = executedResult === result
 
         result = executedResult
-        currentValue = handlerStashValue
-        handlerStashValue = undefined
+        handlerOldValue = undefined
 
         if (valueIsNotChanged) {
           break
@@ -76,7 +79,7 @@ export const Block = (scheme, handlerFn) => {
         changesDetector && changesDetector.checkValues(result, currentValue)
       }
 
-      handlerStashValue = undefined
+      handlerOldValue = undefined
       currentValue = result
       isInitialRender = false
 
