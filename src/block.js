@@ -27,7 +27,7 @@ export const Block = (scheme, handlerFn) => {
 
     const renderScheme = SchemeRenderer(scheme, initialValue, handlerInstance)
 
-    let currentValue = initialValue
+    let currentValue
     let handlerOldValue
     let isInitialRender = true
 

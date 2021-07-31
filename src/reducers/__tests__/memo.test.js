@@ -1,4 +1,6 @@
+import { Block } from '../../block'
 import memo from '../memo'
+import value from '../value'
 
 test('memo valid reduces new value', () => {
   const reducer = memo((a, b) => {
@@ -47,4 +49,18 @@ test('memo apply new value if deps have not changed', () => {
   const result = reducer(newValue, currentValue, 's')
 
   expect(result).toBe(12)
+})
+
+test('memo should work on initial render with block initial data properly', () => {
+  const fn = jest.fn(a => a + 1)
+  const block = Block({
+    a: value(1),
+    m: memo(fn, ['a'])
+  })
+
+  const instance = block({ a: 2 })
+  const result = instance()
+
+  expect(fn.mock.calls.length).toBe(1)
+  expect(result).toEqual({ a: 2, m: 3 })
 })
