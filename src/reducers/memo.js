@@ -7,7 +7,7 @@ import fields from './fields'
 const memo = (reduceFn, deps) =>
   createFieldReducer((value, oldValue, path) => {
     const shouldUpdate = (value, prevValue) => {
-      if (value === undefined && prevValue === undefined) {
+      if (prevValue === undefined) {
         return true
       }
 
