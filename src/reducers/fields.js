@@ -6,7 +6,8 @@ const fields = (reduceFn, deps) =>
   createFieldReducer((value, _, path) => {
     return reduceFn(
       ...deps.map(dep => getPath(value, dep)),
-      getPath(value, path)
+      getPath(value, path),
+      value
     )
   })
 
