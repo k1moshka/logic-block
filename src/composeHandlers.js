@@ -2,27 +2,21 @@ import { isHandler, wrapHandler, type BlockHandler, type HandlerFunction } from 
 
 export default function composeHandlers(...handlersOrFunctions: Array<BlockHandler | HandlerFunction>): BlockHandler {
   return wrapHandler(() => {
-    let nextValue = undefined
-    let prevValue = undefined
-
     const handlers = handlersOrFunctions.map(h => isHandler(h) ? h() : h)
 
-
     return (value, update, oldValue) => {
-      nextValue = value
-      prevValue = oldValue || prevValue
-
       let breakChain = false
 
       const patchedUpdate = (newValue) => {
-        prevValue = nextValue
-        nextValue = update(newValue)
+        const nextValue = update(newValue)
 
         breakChain = true
+
+        return nextValue
       }
 
       for (let handler of handlers) {
-        handler(nextValue, patchedUpdate, prevValue)
+        handler(value, patchedUpdate, oldValue)
 
         if (breakChain) {
           return
