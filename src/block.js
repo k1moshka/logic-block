@@ -35,12 +35,12 @@ export const Block = (scheme, handlerFn) => {
       let result
       if (handlerOldValue) {
         result = renderScheme(merge({}, handlerOldValue, newValue))
+        currentValue = handlerOldValue
       } else {
         // if not, means that update was invoked async
         result = BlockInstance(newValue, path, parentHandlerInstance)
       }
 
-      currentValue = handlerOldValue
       return result
     }
 
