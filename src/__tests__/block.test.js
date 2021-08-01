@@ -4,6 +4,7 @@ import { Block } from '../block'
 import { createFieldReducer } from '../createFieldReducer'
 import { createHandler } from '../handler'
 import { value } from '../reducers'
+import composeHandlers from '../composeHandlers'
 
 describe('Block rendering', () => {
   test('do values setups immediately while processing new value from scheme', () => {
@@ -181,6 +182,63 @@ describe('Block handler', () => {
 
       const result2 = instance({ a: 5 })
       expect(result2).toEqual({ a: 5, b: 2 })
+    })
+  })
+
+  test('does async update pass valid values to handlers', () => {
+    return new Promise(resolve => {
+      const fn = jest.fn(async (value, update) => {
+        if (value.a === 1 && !value.l) {
+          const state1 = update({ l: true })
+          expect(state1).toEqual({ a: 1, l: true })
+
+          const a = await new Promise(r => {
+            setTimeout(() => {
+              r(2)
+            }, 100)
+          })
+
+          const state2 = update({ a })
+          expect(state2).toEqual({ a: 2, l: true })
+
+          const a2 = await new Promise(r => {
+            setTimeout(() => {
+              r(3)
+            }, 100)
+          })
+
+          const state3 = update({ a: a2 })
+          expect(state3).toEqual({ a: 3, l: true })
+        }
+
+        if (value.a === 3) {
+          expect(fn.mock.calls.length).toBe(4)
+          expect(fn.mock.calls[0][0]).toEqual({ a: 1, l: false }) // value
+          expect(fn.mock.calls[0][2]).toBe(undefined) // oldValue
+
+
+          expect(fn.mock.calls[1][0]).toEqual({ a: 1, l: true })
+          expect(fn.mock.calls[1][2]).toEqual({ a: 1, l: false })
+
+
+          expect(fn.mock.calls[2][0]).toEqual({ a: 2, l: true })
+          expect(fn.mock.calls[2][2]).toEqual({ a: 1, l: true })
+
+
+          expect(fn.mock.calls[3][0]).toEqual({ a: 3, l: true })
+          expect(fn.mock.calls[3][2]).toEqual({ a: 2, l: true })
+
+          resolve()
+        }
+      })
+      const block = Block({
+        a: value(1),
+        l: value(false)
+      }, composeHandlers(fn)
+      )
+
+      const instance = block()
+      instance()
     })
   })
 
