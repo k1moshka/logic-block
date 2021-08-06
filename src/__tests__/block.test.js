@@ -51,6 +51,50 @@ describe('Block rendering', () => {
   })
 })
 
+describe('reducing new value with arrays', () => {
+  test('should override reference values', () => {
+    const block = Block({
+      a: value(),
+    })
+    const instance = block()
+
+    instance({ a: [1, 2, 3, 4] })
+    const result = instance({ a: [77] })
+
+
+    expect(result).toEqual({ a: [77] })
+  })
+
+  test('should override reference values in nested objects', () => {
+    const block = Block({
+      a: {
+        b: value()
+      },
+    })
+    const instance = block()
+
+    instance({ a: { b: [1, 2, 3, 4] } })
+    const result = instance({ a: { b: [77] } })
+
+    console.log(result)
+    expect(result).toEqual({ a: { b: [77] } })
+  })
+
+  test('should override reference values in nested blocks', () => {
+    const block = Block({
+      a: Block({
+        b: value()
+      })
+    })
+    const instance = block()
+
+    instance({ a: { b: [1, 2, 3] } })
+    const result = instance({ a: { b: [44] } })
+
+    expect(result).toEqual({ a: { b: [44] }})
+  })
+})
+
 describe('Block updating', () => {
   test('Block update works properly', () => {
     const reducerFn = jest.fn((value, oldValue, path) => getPath(value, path))

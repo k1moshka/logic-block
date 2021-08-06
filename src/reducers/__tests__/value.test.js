@@ -23,3 +23,10 @@ test('value func is running for setting default value', () => {
   expect(fn.mock.calls.length).toBe(1)
   expect(result).toBe(3)
 })
+
+test('value reducer can set values to undefined', () => {
+  const reducer = value([])
+  const result = reducer({ a: undefined }, { a: [] }, 'a')
+
+  expect(typeof result).toBe('undefined')
+})

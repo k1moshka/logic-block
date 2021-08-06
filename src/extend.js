@@ -1,7 +1,6 @@
-import merge from 'lodash/merge'
-
 import { Block } from './block'
 import { isBlock } from './internal/scheme'
+import { merge } from './internal/merge'
 
 export const extend = (...configs) => {
   const result = {}

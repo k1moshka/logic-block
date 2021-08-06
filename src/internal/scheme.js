@@ -1,7 +1,7 @@
 import getPath from 'lodash/get'
 import setPath from 'lodash/set'
-import merge from 'lodash/merge'
 
+import { merge } from './merge'
 import { isBlock } from '../block'
 import { isFieldReducer } from '../createFieldReducer'
 

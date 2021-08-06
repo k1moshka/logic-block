@@ -1,8 +1,7 @@
-import merge from 'lodash/merge'
-
 import { createChangesInstance } from './internal/changes'
 import { SchemeRenderer } from './internal/scheme'
 import { createHandlerFactory } from './internal/createHandlerFactory'
+import { merge } from './internal/merge'
 
 const HANDLER_LOOP_LIMIT = 100
 
