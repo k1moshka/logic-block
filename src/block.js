@@ -1,4 +1,3 @@
-import { createChangesInstance } from './internal/changes'
 import { SchemeRenderer } from './internal/scheme'
 import { createHandlerFactory } from './internal/createHandlerFactory'
 import { merge } from './internal/merge'
@@ -18,9 +17,7 @@ export const Block = (scheme, handlerFn) => {
 
 
   const blockFactory = (initialValue, options = {}) => {
-    const { handleUpdate, handleChanges } = options
-    const changesDetector = typeof handleChanges === 'function'
-      && createChangesInstance(handleChanges)
+    const { handleUpdate } = options
 
     const handlerInstance = handlerFactory(HandlerRenderer)
 
@@ -75,7 +72,6 @@ export const Block = (scheme, handlerFn) => {
 
       if (!isInitialRender) {
         handleUpdate && handleUpdate(result)
-        changesDetector && changesDetector.checkValues(result, currentValue)
       }
 
       handlerOldValue = undefined
