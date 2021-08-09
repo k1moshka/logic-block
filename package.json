@@ -1,5 +1,5 @@
 {
-  "name": "data-block",
+  "name": "logic-block",
   "version": "1.0.0",
   "description": "JavaScript library for bundling bussiness logic of your data to common containers called blocks",
   "main": "lib/index.js",
@@ -7,11 +7,13 @@
     "test": "jest",
     "build": "npx babel src --out-dir lib --ignore \"**/*.test.js\""
   },
+  "files": ["lib"],
   "keywords": [
     "data",
+    "logic",
     "business-logic",
     "block",
-    "data-block"
+    "logic-block"
   ],
   "author": "Ilya Melishnikov",
   "license": "MIT",

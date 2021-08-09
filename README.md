@@ -1,4 +1,4 @@
-# DATA BLOCK
+# LOGIC BLOCK
 
 **v1.0**
 
@@ -17,19 +17,19 @@ And of course, it is very simple in usage.
 ## Installation
 Just add it to project dependencies
 ```
-yarn add data-block
+yarn add logic-block
 // or
-npm install --save data-block
+npm install --save logic-block
 ```
 
 ## Usage
 **IMPORTANT:**
-The data-block lib is not an app state handler lib (like redux). Every block is just a runner of data logic.
+The logic-block lib is not an app state handler lib (like redux). Every block is just a runner of data logic.
 
 1. Define a block with couple of rules (field reducers)
 
 ```javascript
-import Block, { value, fields } from 'data-block'
+import Block, { value, fields } from 'logic-block'
 
 const emailBlock = Block({
   email:
@@ -105,11 +105,11 @@ You get BlockInstance on every call of BlockFactory.
 wrapHandler allows you to define your handler for block
 | Argument       | Type                                                                | Optional? | Description                                                                          |
 | -------------- | ------------------------------------------------------------------- | --------- | ------------------------------------------------------------------------------------ |
-| handlerFactory | `() => (value: Object, update: Function, oldValue: Object) => void` | Mandatory | Handler factory is a function that returns handler for every instance of data block. |
+| handlerFactory | `() => (value: Object, update: Function, oldValue: Object) => void` | Mandatory | Handler factory is a function that returns handler for every instance of logic block. |
 
 **Example:**
 ```javascript
-import Block, { wrapHandler, value } from 'data-block'
+import Block, { wrapHandler, value } from 'logic-block'
 // define block for checking emails
 const EmailBlock = Block({
   email: value(),
@@ -150,7 +150,7 @@ emailChecker()
 createHandler is a shortcut function for wrapHandler, that gets as a parameter handler of updates.
 **Example:**
 ```javascript
-import Block, { wrapHandler, value } from 'data-block'
+import Block, { wrapHandler, value } from 'logic-block'
 
 const progress = Block({
   percent: value(0),
@@ -172,7 +172,7 @@ createFieldReducer creates the field reducer that applies some metadata from sch
 **Example:**
 ```javascript
 import getPath from 'lodash/get'
-import Block, { createFieldReducer } from 'data-block'
+import Block, { createFieldReducer } from 'logic-block'
 
 // the reducer that applies dependencies, which we can use in actual reducer function
 const isUpgraded = (depField: string) => {
@@ -273,10 +273,10 @@ const instance = Block({
 ## Motivation
 I have created this lib for one of my projects, where the same business-logic should be using on different clients.
 They had different UI, API, servers, code, platforms, but all them uses the pretty same logic for data.
-And I thought about implementing business logic as separate library with minimal dependecies (the only dependency is data-block).
-So the data-block solved my problem excellently.
+And I thought about implementing business logic as separate library with minimal dependecies (the only dependency is logic-block).
+So the logic-block solved my problem excellently.
 
-Data blocks in combination with handlers gives simple and powerful solution for writing code that should be shared between projects.
+Logic blocks in combination with handlers gives simple and powerful solution for writing code that should be shared between projects.
 
 Also it gives enough level of flexability and declarativeness.
 

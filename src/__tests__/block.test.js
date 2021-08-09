@@ -110,7 +110,7 @@ describe('Block updating', () => {
     expect(reducerFn.mock.calls[1][2]).toBe('a') // path
   })
 
-  test('Block update nested data-blocks properly', () => {
+  test('Block update nested logic-blocks properly', () => {
     const block = Block({ a: Block({ b: value(1) }) })
     const instance = block()
     const initial = instance()
