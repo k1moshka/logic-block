@@ -1,4 +1,4 @@
-import { wrapHandler } from 'data-block'
+import { wrapHandler } from '../'
 
 const onCreateHandler = (fn) => wrapHandler(() => {
   let run = false
