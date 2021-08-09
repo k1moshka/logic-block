@@ -76,7 +76,6 @@ describe('reducing new value with arrays', () => {
     instance({ a: { b: [1, 2, 3, 4] } })
     const result = instance({ a: { b: [77] } })
 
-    console.log(result)
     expect(result).toEqual({ a: { b: [77] } })
   })
 
