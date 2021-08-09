@@ -64,10 +64,10 @@ That's it. For more real-world example check the code in **example folder**.
 ### **Block**
 Block is just a builder function that provides factory of instances of defined block-scheme.
 
-| Argument | Type                                                                     | Description                                                                                                                                                                                               |
-| -------- | ------------------------------------------------------------------------ | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| scheme   | `Object`                                                                 | The scheme what will use for reduce block instance state                                                                                                                                                  |
-| handler  | `(value: Object, update: Function, oldValue: Object) => void` (optional) | The handler is a function what runs every time when block instance is updating. It runs once after new state was calculated, and gets as parameters new state value, update function and old state value. |
+| Argument | Type                                                                | Optional? | Description                                                                                                                                                                                               |
+| -------- | ------------------------------------------------------------------- | --------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| scheme   | `Object`                                                            | Mandatory | The scheme what will use for reduce block instance state                                                                                                                                                  |
+| handler  | `() => (value: Object, update: Function, oldValue: Object) => void` | Optional  | The handler is a function what runs every time when block instance is updating. It runs once after new state was calculated, and gets as parameters new state value, update function and old state value. |
 
 **Result**
 
@@ -78,12 +78,11 @@ BlockFactory is a function which process data from input to the output calculate
 
 You get BlockFactory from block factory (you get block factory as result of call Block function).
 
-| Argument              | Type                                           | Description                                                                                                                                                                          |
-| --------------------- | ---------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| initialValue          | `Object` (optional)                            | Initial value wich will use as old and new value in first render                                                                                                                     |
-| options               | `InstanceOptions` (optional)                   | Options for creating instance, you can provide instance level update handler and changes detector                                                                                    |
-| options.handleUpdate  | `(newValue: Object) => void` (optional)        | This function like handler calls once after new value calculated, but only for that instance. This is good place for reacting on updates of data in your app (update UI for example) |
-| options.handleChanges | `({ has, hasAny, hasAll }) => void` (optional) | Function that like handler calls once after new value calculated, detects and runs callbacks for relative changes                                                                    |
+| Argument              | Type                                | Optional, | Description                                                                                                                                                                          |
+| --------------------- | ----------------------------------- | --------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| initialValue          | `Object`                            | Optional  | Initial value wich will use as old and new value in first render                                                                                                                     |
+| options               | `InstanceOptions`                   | Optional  | Options for creating instance, you can provide instance level update handler and changes detector                                                                                    |
+| options.handleUpdate  | `(newValue: Object) => void`        | Optional  | This function like handler calls once after new value calculated, but only for that instance. This is good place for reacting on updates of data in your app (update UI for example) |
 
 **Result**
 
@@ -94,19 +93,21 @@ BlockInstance is a function that takes changes in data and provide as a result c
 
 You get BlockInstance on every call of BlockFactory.
 
-| Argument      | Type                | Description                                                                                                                                                       |
-| ------------- | ------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| changedValues | `Object` (optional) | Object that is slice of data, but it usually contains only changed values. If you don't provide this argument, BlockInstance will process data with current value |
+| Argument      | Type     | Optional? | Description                                                                                                                                                       |
+| ------------- | -------- | --------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| changedValues | `Object` | Optional  | Object that is slice of data, but it usually contains only changed values. If you don't provide this argument, BlockInstance will process data with current value |
 
 
 
 ## Motivation
-I have created this lib for my one project, where the same business-logic should be using on different clients.
+I have created this lib for one of my projects, where the same business-logic should be using on different clients.
 They had different UI, API, servers, code, platforms, but all them uses the pretty same logic for data.
 And I thought about implementing business logic as separate library with minimal dependecies (the only dependency is data-block).
 So the data-block solved my problem excellently.
 
 Data blocks in combination with handlers gives simple and powerful solution for writing code that should be shared between projects.
+
+Also it gives enough level of flexability and declarativeness.
 
 So I wanted to share it with the community.
 
