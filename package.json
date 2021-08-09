@@ -1,11 +1,11 @@
 {
   "name": "data-block",
   "version": "1.0.0",
-  "description": "Unified javascript data and business-logic handling utilities wrapped to flexible blocks",
+  "description": "JavaScript library for bundling bussiness logic of your data to common containers called blocks",
   "main": "lib/index.js",
   "scripts": {
     "test": "jest",
-    "build": "webpack"
+    "build": "npx babel src --out-dir lib --ignore \"**/*.test.js\""
   },
   "keywords": [
     "data",
@@ -14,14 +14,14 @@
     "data-block"
   ],
   "author": "Ilya Melishnikov",
-  "license": "ISC",
+  "license": "MIT",
   "dependencies": {
     "core-js": "^3.14.0",
     "lodash": "^4.17.21"
   },
   "devDependencies": {
     "@babel/cli": "^7.14.3",
-    "@babel/core": "^7.14.3",
+    "@babel/core": "^7.14.8",
     "@babel/preset-env": "^7.14.4",
     "@babel/preset-flow": "^7.14.5",
     "babel-eslint": "^10.1.0",
