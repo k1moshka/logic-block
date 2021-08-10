@@ -4,7 +4,7 @@
   "description": "JavaScript library for bundling bussiness logic of your data to common containers called blocks",
   "main": "lib/index.js",
   "scripts": {
-    "test": "jest",
+    "test": "npx jest",
     "build": "npx babel src --out-dir lib --ignore \"**/*.test.js\""
   },
   "files": ["lib"],
@@ -15,8 +15,16 @@
     "block",
     "logic-block"
   ],
-  "author": "Ilya Melishnikov",
+  "author": "Ilya Melishnikov <364844@gmail.com> (https://www.linkedin.com/in/ilya-melishnikov/)",
   "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/k1moshka/logic-block"
+  },
+  "homepage": "https://github.com/k1moshka/logic-block#readme",
+  "bugs": {
+    "url": "https://github.com/k1moshka/logic-block/issues"
+  },
   "dependencies": {
     "core-js": "^3.14.0",
     "lodash": "^4.17.21"
