@@ -1,7 +1,5 @@
 export type Render = (partialUpdatedValues: Object) => Object
 
-export type PartialHandler = (selfRender: Render) => HandlerInstance
-
 export type HandlerInstance = {
   getPath: () => string,
   wrapParentHandler: (parent: HandlerInstance, path: string) => void,
