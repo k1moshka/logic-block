@@ -1,12 +1,19 @@
 import { SchemeRenderer } from './internal/scheme'
 import { createHandlerFactory } from './internal/createHandlerFactory'
 import { merge } from './internal/merge'
+import { type BlockHandler } from './handler'
+
+export type BlockInstanceOptions = {
+  handleUpdate: (newValue: Object) => void
+}
+export type BlockFactory = (initialValues: Object, options: BlockInstanceOptions) => (Object) => Object
+
 
 const HANDLER_LOOP_LIMIT = 100
 
 export const isBlock = test => test.__block === true
 
-export const Block = (scheme, handlerFn) => {
+export const Block = (scheme: Object, handlerFn: BlockHandler): BlockFactory => {
   // handlerFn это обработчик который определяется на стадии определения блока
   let handlerFactory
   if (typeof handlerFn === 'function') {
@@ -80,11 +87,12 @@ export const Block = (scheme, handlerFn) => {
 
       return result
     }
-    BlockInstance.__data_block = true
+    BlockInstance.__block_instance = true
 
     return BlockInstance
   }
   blockFactory.__getScheme = () => merge({}, scheme)
+  blockFactory.__getHandler = () => handlerFn
   blockFactory.__block = true
 
 
