@@ -22,7 +22,7 @@ export const SchemeRenderer = (scheme, initialValue, handlerInstance) => {
         if (typeof entry === 'function') {
 
           if (isFieldReducer(entry)) {
-            setPath(result, fullPath, entry(result, oldValue, fullPath))
+            setPath(result, fullPath, entry(result, oldValue, fullPath, handlerInstance))
 
           } else if (isBlock(entry)) {
             if (!blocks[fullPath]) {

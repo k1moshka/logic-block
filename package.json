@@ -1,6 +1,6 @@
 {
   "name": "logic-block",
-  "version": "1.0.4",
+  "version": "1.0.5",
   "description": "JavaScript library for bundling bussiness logic of your data to common containers called blocks",
   "main": "lib/index.js",
   "scripts": {

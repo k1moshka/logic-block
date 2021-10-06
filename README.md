@@ -103,8 +103,8 @@ You get BlockInstance on every call of BlockFactory.
 
 ### **wrapHandler**
 wrapHandler allows you to define your handler for block
-| Argument       | Type                                                                | Optional? | Description                                                                          |
-| -------------- | ------------------------------------------------------------------- | --------- | ------------------------------------------------------------------------------------ |
+| Argument       | Type                                                                | Optional? | Description                                                                           |
+| -------------- | ------------------------------------------------------------------- | --------- | ------------------------------------------------------------------------------------- |
 | handlerFactory | `() => (value: Object, update: Function, oldValue: Object) => void` | Mandatory | Handler factory is a function that returns handler for every instance of logic block. |
 
 **Example:**
@@ -164,9 +164,9 @@ const progress = Block({
 
 ### **createFieldReducer**
 createFieldReducer creates the field reducer that applies some metadata from scheme and returns new value based on it
-| Argument  | Type                                                         | Optional? | Description                                                                        |
-| --------- | ------------------------------------------------------------ | --------- | ---------------------------------------------------------------------------------- |
-| reducerFn | `(newValue: Object, oldValue: Object, path: string) => void` | Mandatory | Reducer function that calculate new value based on all metadata and value provided |
+| Argument  | Type                                                                                    | Optional? | Description                                                                                                                                                                                                                                                                                                                |
+| --------- | --------------------------------------------------------------------------------------- | --------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| reducerFn | `(newValue: Object, oldValue: Object, path: string, handlerInstance: Function) => void` | Mandatory | Reducer function that calculate new value based on all metadata and value provided. If you create new block instances in the field reducer, please put in the instance constructor `handlerInstance` as last param (to connect this block instance with block instance what is using it), and also provide `path` as well. |
 
 
 **Example:**
@@ -176,7 +176,7 @@ import Block, { createFieldReducer } from 'logic-block'
 
 // the reducer that applies dependencies, which we can use in actual reducer function
 const isUpgraded = (depField: string) => {
-  return createReducer((value, oldValue, path) => {
+  return createFieldReducer((value, oldValue, path) => {
     if (getPath(value, depField) > getPath(oldValue, depField)) {
       return 'upgraded'
     }
