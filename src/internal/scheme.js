@@ -39,7 +39,15 @@ export const SchemeRenderer = (scheme, initialValue, handlerInstance) => {
 
         } else if (typeof entry === 'object') {
 
-          renderSchemePart(entry, key)
+          if (Array.isArray(entry)) {
+
+            entry.forEach(() => renderSchemePart(entry, key))
+
+          } else {
+
+            renderSchemePart(entry, key)
+
+          }
 
         } else {
           setPath(result, fullPath, entry)

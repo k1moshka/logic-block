@@ -1,6 +1,6 @@
 # LOGIC BLOCK
 
-**v1.0**
+**v1.1**
 
 
 Logic block is a JavaScript library for bundling bussiness logic of your data to common containers called blocks.
@@ -191,6 +191,31 @@ const block = Block({
   b: isUpgraded('a')
 })
 
+```
+
+### **updateArray**
+updateArray creates the update value for passing to the render method for block instance, use it if you have any kind of array in your schema. You can use it anywhere for updating block instance value (initialization, rendering call, handler)
+| Argument | Type     | Optional? | Description                   |
+| -------- | -------- | --------- | ----------------------------- |
+| atIndex  | `number` | Mandatory | Where to put new value        |
+| value    | `any`    | Mandatory | New value to put in the array |
+
+**Example:**
+```javascript
+import Block, { updateArray } from 'logic-block'
+import SectionBlock from './SectionBlock'
+
+const block = Block({
+  sections: [
+    SectionBlock('examples'),
+    SectionBlock('links'),
+    SectionBlock('reminders')
+  ]
+})
+// use for update 3-rd section with new value in initial values
+const instance = block({ sections: updateArray(2, { title: 'reminder tip' }) })
+// or update 2-nd section with new value in the rendering call
+const result = instance({ sections: updateArray(1, { title: 'scrap booking link' } ) })
 ```
 
 
