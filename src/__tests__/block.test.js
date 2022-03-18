@@ -49,6 +49,44 @@ describe('Block rendering', () => {
     const result = Block({ a: value(1) })({ a: 2 })()
     expect(result).toEqual({ a: 2 })
   })
+
+  test('Block renders array of blocks properly', () => {
+    const entry = Block({ b: value(1) })
+    const block = Block({
+      a: [
+        entry,
+        entry,
+        entry
+      ]
+    })
+
+    const instance = block()
+    const result = instance()
+
+    expect(result).toEqual({
+      a: [
+        { b: 1 },
+        { b: 1 },
+        { b: 1 },
+      ]
+    })
+  })
+
+  test('Block render array of blocks with initial value properly', () => {
+    const entry = Block({ b: value(1) })
+    const block = Block({
+      a: [
+        entry
+      ]
+    })
+
+    const instance = block({ a: [{ b: 33 }] })
+    const result = instance()
+
+    expect(result).toEqual({
+      a: [{ b: 33 }]
+    })
+  })
 })
 
 describe('reducing new value with arrays', () => {
@@ -90,7 +128,7 @@ describe('reducing new value with arrays', () => {
     instance({ a: { b: [1, 2, 3] } })
     const result = instance({ a: { b: [44] } })
 
-    expect(result).toEqual({ a: { b: [44] }})
+    expect(result).toEqual({ a: { b: [44] } })
   })
 })
 
@@ -129,6 +167,76 @@ describe('Block updating', () => {
     expect(initial).toEqual({ a: { b: 1 } })
     expect(result).toEqual({ a: { b: 2 } })
   })
+
+  test('Block update array of blocks with undefined values will not change the value', () => {
+    const entry = Block({ b: value(1) })
+    const entry2 = Block({ c: Block({ d: value(2) }) })
+    const block = Block({
+      a: [
+        entry,
+        entry2,
+        entry
+      ]
+    })
+
+    const instance = block()
+    const initial = instance()
+    const result1 = instance({ a: [undefined, undefined, undefined] })
+
+    expect(initial).toEqual({
+      a: [
+        { b: 1 },
+        { c: { d: 2 } },
+        { b: 1 },
+      ]
+    })
+    expect(result1).toEqual({
+      a: [
+        { b: 1 },
+        { c: { d: 2 } },
+        { b: 1 },
+      ]
+    })
+  })
+
+  test('Block update array of blocks update value properly', () => {
+    const entry = Block({ b: value(1) })
+    const entry2 = Block({ c: Block({ d: value(2) }) })
+    const block = Block({
+      a: [
+        entry,
+        entry2,
+        entry
+      ]
+    })
+
+    const instance = block()
+    const initial = instance()
+    const result1 = instance({ a: [undefined, undefined, { b: 15 }] })
+    const result2 = instance({ a: [undefined, { c: { d: 33 } }, { b: 16 }] })
+
+    expect(initial).toEqual({
+      a: [
+        { b: 1 },
+        { c: { d: 2 } },
+        { b: 1 },
+      ]
+    })
+    expect(result1).toEqual({
+      a: [
+        { b: 1 },
+        { c: { d: 2 } },
+        { b: 15 },
+      ]
+    })
+    expect(result2).toEqual({
+      a: [
+        { b: 1 },
+        { c: { d: 33 } },
+        { b: 16 },
+      ]
+    })
+  })
 })
 
 describe('Block instance options', () => {
@@ -138,7 +246,7 @@ describe('Block instance options', () => {
       b: value(2)
     })
 
-    const fn = jest.fn(() => {})
+    const fn = jest.fn(() => { })
     const instance = block(undefined, {
       handleUpdate: fn
     })
@@ -158,7 +266,7 @@ describe('Block instance options', () => {
 
 describe('Block handler', () => {
   test('Block handler works properly', () => {
-    const fn = jest.fn(() => {})
+    const fn = jest.fn(() => { })
     const block = Block({
       a: value(1),
       b: value(2)
@@ -287,7 +395,7 @@ describe('Block handler', () => {
 
 
   test('Nested block handler works properly', () => {
-    const fn = jest.fn(() => {})
+    const fn = jest.fn(() => { })
     const ctxBlock = Block({
       a: value(1),
       b: value(2)

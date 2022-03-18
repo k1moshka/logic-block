@@ -1,6 +1,6 @@
 # LOGIC BLOCK
 
-**v1.0**
+**v1.1**
 
 
 Logic block is a JavaScript library for bundling bussiness logic of your data to common containers called blocks.
@@ -103,8 +103,8 @@ You get BlockInstance on every call of BlockFactory.
 
 ### **wrapHandler**
 wrapHandler allows you to define your handler for block
-| Argument       | Type                                                                | Optional? | Description                                                                          |
-| -------------- | ------------------------------------------------------------------- | --------- | ------------------------------------------------------------------------------------ |
+| Argument       | Type                                                                | Optional? | Description                                                                           |
+| -------------- | ------------------------------------------------------------------- | --------- | ------------------------------------------------------------------------------------- |
 | handlerFactory | `() => (value: Object, update: Function, oldValue: Object) => void` | Mandatory | Handler factory is a function that returns handler for every instance of logic block. |
 
 **Example:**
@@ -164,9 +164,9 @@ const progress = Block({
 
 ### **createFieldReducer**
 createFieldReducer creates the field reducer that applies some metadata from scheme and returns new value based on it
-| Argument  | Type                                                         | Optional? | Description                                                                        |
-| --------- | ------------------------------------------------------------ | --------- | ---------------------------------------------------------------------------------- |
-| reducerFn | `(newValue: Object, oldValue: Object, path: string) => void` | Mandatory | Reducer function that calculate new value based on all metadata and value provided |
+| Argument  | Type                                                                                    | Optional? | Description                                                                                                                                                                                                                                                                                                                |
+| --------- | --------------------------------------------------------------------------------------- | --------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| reducerFn | `(newValue: Object, oldValue: Object, path: string, handlerInstance: Function) => void` | Mandatory | Reducer function that calculate new value based on all metadata and value provided. If you create new block instances in the field reducer, please put in the instance constructor `handlerInstance` as last param (to connect this block instance with block instance what is using it), and also provide `path` as well. |
 
 
 **Example:**
@@ -176,7 +176,7 @@ import Block, { createFieldReducer } from 'logic-block'
 
 // the reducer that applies dependencies, which we can use in actual reducer function
 const isUpgraded = (depField: string) => {
-  return createReducer((value, oldValue, path) => {
+  return createFieldReducer((value, oldValue, path) => {
     if (getPath(value, depField) > getPath(oldValue, depField)) {
       return 'upgraded'
     }
@@ -191,6 +191,31 @@ const block = Block({
   b: isUpgraded('a')
 })
 
+```
+
+### **updateArray**
+updateArray creates the update value for passing to the render method for block instance, use it if you have any kind of array in your schema. You can use it anywhere for updating block instance value (initialization, rendering call, handler)
+| Argument | Type     | Optional? | Description                   |
+| -------- | -------- | --------- | ----------------------------- |
+| atIndex  | `number` | Mandatory | Where to put new value        |
+| value    | `any`    | Mandatory | New value to put in the array |
+
+**Example:**
+```javascript
+import Block, { updateArray } from 'logic-block'
+import SectionBlock from './SectionBlock'
+
+const block = Block({
+  sections: [
+    SectionBlock('examples'),
+    SectionBlock('links'),
+    SectionBlock('reminders')
+  ]
+})
+// use for update 3-rd section with new value in initial values
+const instance = block({ sections: updateArray(2, { title: 'reminder tip' }) })
+// or update 2-nd section with new value in the rendering call
+const result = instance({ sections: updateArray(1, { title: 'scrap booking link' } ) })
 ```
 
 

@@ -2,7 +2,7 @@ import Block, { value, createHandler, wrapHandler } from '../'
 
 describe('handler works properly', () => {
   test('handler can get value', () => {
-    const handler = jest.fn(() => {})
+    const handler = jest.fn(() => { })
     const block = Block({
       a: value(1)
     }, createHandler(handler))
@@ -55,5 +55,26 @@ describe('handler works properly', () => {
 
     expect(updateFn.mock.calls.length).toBe(5)
     expect(fn.mock.calls.length).toBe(1)
+  })
+
+  test('handler in array of blocks works properly', () => {
+    const fn = jest.fn(() => { })
+
+    const block = Block({
+      a: [
+        Block({
+          b: value(1)
+        }, createHandler(fn))
+      ]
+    })
+    const instance = block()
+
+    instance()
+    instance({ a: [{ b: 2 }] })
+    instance({ a: [{ b: 3 }] })
+    instance({ a: [{ b: 4 }] })
+    instance({ a: [{ b: 5 }] })
+
+    expect(fn.mock.calls.length).toBe(5)
   })
 })
