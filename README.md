@@ -270,6 +270,39 @@ const instance = Block({
 }, ['type']))
 ```
 
+## List of block changers
+Block changer is a tools which provide some operations on block factory instances. For example you can extend one block with other, you can change handler, etc.
+
+1. `extend(...blockArgs: Array<BlockFactory | Object>) => BlockFactory` - this changer function takes
+list of block factories or objects (which will be used as schemes) and create new block factory by merging schemes from right to left.
+That means that more righter blocks or schemes in arguments will override scheme fields in all lefter block factory.
+**IMPORTANT:** it does not apply handlers from blocks to the result block
+
+```javascript
+const newBlock = extend(Block(s1), Block(s2), Block(s3), scheme4)
+```
+
+2. `copy(block: BlockFactory) => BlockFactory` - this changer function create full copy of passing block factory, also it is copying block handler
+```javascript
+// newBlock will be full copy of b1
+const b1 = Block(scheme)
+const newBlock = copy(b1)
+```
+
+3. `inherit(parentBlock: BlockFactory | Object, extendingBlock: BlockFactory | Object, extraHandler?: BlockHandler) => BlockFactory` -
+this changer function extends schemes from parentBlock to extendingBlock and combines parent's block handler with extra handler if they exists
+```javascript
+const CarBlock = inherit(WheelsBlock, CabinBlock, carExtraHandler)
+```
+
+4. `withHandler(block: BlockFactory | Object, handler: BlockHandler) => BlockFactory` - this changer function applies block or object and returns new block with replaced handler.
+**IMPORTANT**: it does not combine handlers from original block and handler which passed as argument, it sets as handler only passed block handler.
+```javascript
+const block = Block({}, handler1)
+// blockWithOtherHandler will have only handler2 as handler
+const blockWithOtherHandler = withHandler(block, handler2)
+```
+
 ## Motivation
 I have created this lib for one of my projects, where the same business-logic should be using on different clients.
 They had different UI, API, servers, code, platforms, but all them uses the pretty same logic for data.
