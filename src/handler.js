@@ -10,7 +10,7 @@ export type HandlerInstance = {
 export type HandlerFunction = (value: Object, update: Function, oldValue: Object) => {}
 export type BlockHandler = () => HandlerFunction
 
-export const isHandler = test => test.__block_handler === true
+export const isHandler = test => test && test.__block_handler === true
 
 export const wrapHandler = (handler: BlockHandler): BlockHandler => {
   handler.__block_handler = true
