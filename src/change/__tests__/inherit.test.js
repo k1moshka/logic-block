@@ -76,3 +76,10 @@ test('inherit with invalid parameters throws error', () => {
   }).toThrow(TypeError)
 })
 
+test('inherit applies scheme from left to right', () => {
+  const block = inherit(Block({ a: 1 }), Block({ a: 2 }))
+
+  const value = block()()
+
+  expect(value).toEqual({ a: 2 })
+})
