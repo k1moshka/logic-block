@@ -1,4 +1,3 @@
-import { expect } from '@jest/globals'
 import Block, { withHandler, createHandler } from '../../index'
 
 test('with handler should copy and add handler to block', () => {

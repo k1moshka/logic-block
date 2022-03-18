@@ -1,4 +1,3 @@
-import { expect } from '@jest/globals'
 import Block, { extend } from '../../index'
 
 test('should extend two blocks', () => {
