@@ -1,6 +1,6 @@
 # LOGIC BLOCK
 
-**v1.2.1**
+**v1.2.2**
 
 
 Logic block is a JavaScript library for bundling bussiness logic of your data to common containers called blocks.
@@ -235,41 +235,42 @@ Block({
     only if dependecies values were changed. And also it can put the value if you update field directly.
 **Example:**
 ```javascript
-const instance = Block({
+const block = Block({
   html: value(''),
   version: value(1),
   formattedMessage: memo(html => reallyHardLogicForHandlingHTML(html), ['html'])
 })
 
 // here the formatted message will handled by reducer
-instance({ html: DEFAULT_HTML })
+block({ html: DEFAULT_HTML })
 // here the formatted message will set to SOME_CUSTOM_FORMATTED_MESSAGE value
-instance({ formattedMessage: SOME_CUSTOM_FORMATTED_MESSAGE })
+block({ formattedMessage: SOME_CUSTOM_FORMATTED_MESSAGE })
 // here the formatted message won't be changed
-instance({ version: 22 })
+block({ version: 22 })
 ```
 4. `reduce(reducerFn: (value: Object, fieldValue: any) => any)` - reducer simply gets new value of block and new value of field
 1. `option(defaultValue: any, options: Array<any>)` - reducer that allows as result only values at options list
 **Example:**
 ```javascript
-const instance = Block({
+const block = Block({
   // initial value if not provided will be 'list'
   type: option('list', ['list', 'grid'])
 })
 
 // here the type will change on 'grid'
-instance({ type: 'grid' })
+block({ type: 'grid' })
 // here the type will stay as 'grid'
-instance({ type: 'unreginstered_type' })
+block({ type: 'unreginstered_type' })
 ```
 
 
 ## List of default handlers
 1. `memoHandler(handlerFn: Function, dependencies: Array<string>)` - this handler like as memo `field` reducer, runs only if
    dependecy values were changed.
+
 **Example**
 ```javascript
-const instance = Block({
+const block = Block({
   // initial value if not provided will be 'list'
   type: option('list', ['list', 'grid']),
   classnames: value([])
@@ -282,9 +283,10 @@ const instance = Block({
 
 
 2. `onCreateHandler(handlerFn: (value, update, oldValue) => void)` - this handler run the `handlerFn` only when new instance was created
+
 **Example:**
 ```javascript
-const instance = Block({
+const block = Block({
   // initial value if not provided will be 'list'
   type: option('list', ['list', 'grid']),
   possibleConfigs: value()
@@ -293,6 +295,22 @@ const instance = Block({
   const configs = await api.getPossibleConfigs(type)
   update({ possibleConfigs: configs })
 }, ['type']))
+```
+
+3. `composeHandlers(...handlers: Array<BlockHandler | HandlerFunction>)` - use this handler for attaching multiple handlers on one block.
+
+**Important**: *it works in the next way: when block instance renders it invokes all handlers in composed func one by one, if one handler in the chain
+updates value it invokes next handler with updated value. If any of handler updated value it will invoke this all handlers one more time after all handlers run.*
+
+**Example:**
+```javascript
+const block = Block({
+  // ...
+}, composeHandlers(
+  onCreateHandler(fn0),
+  memoHandler(fn1, ['a']),
+  memoHandler(fn2, ['b'])
+))
 ```
 
 ## List of block changers
