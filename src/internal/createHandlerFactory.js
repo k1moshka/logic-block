@@ -8,15 +8,15 @@ export const createHandlerFactory = (handler: BlockHandler) => {
   return (selfRender) => {
     const handlerFn = handler()
 
-    let parentCtxInstance
+    let parentHandlerInstance
     let pathToBlock
     let updatedValue
 
     const update = (newValue: Object): Object => {
-      updatedValue = selfRender(newValue, pathToBlock, parentCtxInstance)
+      updatedValue = selfRender(newValue, pathToBlock, parentHandlerInstance)
 
-      if (parentCtxInstance) {
-        parentCtxInstance.updateWithValue(pathToBlock, updatedValue)
+      if (parentHandlerInstance) {
+        parentHandlerInstance.updateWithValue(pathToBlock, updatedValue)
       }
 
       return updatedValue
@@ -26,8 +26,8 @@ export const createHandlerFactory = (handler: BlockHandler) => {
 
       getPath: (): string => pathToBlock,
 
-      wrapParentHandler(parentHandlerInstance: HandlerInstance, path: string) {
-        parentCtxInstance = parentHandlerInstance
+      wrapParentHandler(_parentHandlerInstance: HandlerInstance, path: string) {
+        parentHandlerInstance = _parentHandlerInstance
         pathToBlock = path
       },
 

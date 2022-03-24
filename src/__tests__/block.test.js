@@ -1,5 +1,6 @@
 import getPath from 'lodash/get'
 
+import { memoHandler } from '../'
 import { Block } from '../block'
 import { createFieldReducer } from '../createFieldReducer'
 import { createHandler } from '../handler'
@@ -443,8 +444,72 @@ describe('Block handler', () => {
     expect(result).toEqual({ ctx: { a: 4, b: 100 } })
   })
 
+  test('incremental state updates work properly', () => {
+    const block = Block({
+      update: value(false),
+      a: value(1),
+      b: value(1)
+    }, memoHandler((upd, update) => {
+      if (!upd) {
+        return
+      }
+      update({ a: 2 })
+      const newValue = update({ b: 2 })
+      expect(newValue).toEqual({ a: 2, b: 2, update: true })
+    }, ['update']))
+
+    const instance = block()
+    instance()
+    const res = instance({ update: true })
+
+    expect(res).toEqual({ a: 2, b: 2, update: true })
+  })
+
+  test('incremental state updates work in nested block properly', () => {
+    const block = Block({
+      update: value(false),
+      nested: Block({
+        a: value(1),
+        b: value(1)
+      })
+    }, memoHandler((upd, update) => {
+      if (upd) {
+        update({ nested: { a: 2 } })
+        update({ nested: { b: 2 } })
+      }
+    }, ['update']))
+
+    const instance = block()
+    instance()
+    const res = instance({ update: true })
+
+    expect(res).toEqual({ update: true, nested: { a: 2, b: 2 } })
+  })
+
+  test('incremental state updates work in nested sibling blocks properly', () => {
+    const block = Block({
+      update: value(false),
+      n1: Block({
+        a: value(1)
+      }),
+      n2: Block({
+        b: value(1)
+      })
+    }, memoHandler((upd, update) => {
+      if (upd) {
+        update({ n1: { a: 2 } })
+        update({ n2: { b: 2 } })
+      }
+    }, ['update']))
+
+    const instance = block()
+    instance()
+    const res = instance({ update: true })
+
+    expect(res).toEqual({ update: true, n1: { a: 2 }, n2: { b: 2 } })
+  })
+
   // TODO: implement it
   // test('Really deep nested blocks with updates', () => {
   // })
-
 })

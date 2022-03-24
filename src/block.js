@@ -14,7 +14,7 @@ const HANDLER_LOOP_LIMIT = 100
 export const isBlock = test => test.__block === true
 
 export const Block = (scheme: Object, handlerFn: BlockHandler): BlockFactory => {
-  // handlerFn это обработчик который определяется на стадии определения блока
+  // handlerFn - handler that defines in definition-time
   let handlerFactory
   if (typeof handlerFn === 'function') {
     handlerFactory = createHandlerFactory(handlerFn)
@@ -39,6 +39,14 @@ export const Block = (scheme: Object, handlerFn: BlockHandler): BlockFactory => 
       if (handlerOldValue) {
         result = renderScheme(merge({}, handlerOldValue, newValue))
         currentValue = handlerOldValue
+        // update handler old value due to work multiple sync update function in the same handler
+        // example:
+        // --------------------------
+        // update({a: 1}); update({b: 1});
+        // this invokes will updated both fields 'a' and 'b'
+        // but ig we dont set handler old value it will cause to update only from last invoke of 'update'
+        // --------------------------
+        handlerOldValue = result
       } else {
         // if not, means that update was invoked async
         result = BlockInstance(newValue, path, parentHandlerInstance)
@@ -48,7 +56,7 @@ export const Block = (scheme: Object, handlerFn: BlockHandler): BlockFactory => 
     }
 
     function BlockInstance(newValue = initialValue, path, parentHandlerInstance) {
-      // parentHandler - это инстанс хэндлера родителя
+      // parentHandler - isntance of parent handler
       handlerInstance.wrapParentHandler(parentHandlerInstance, path)
 
       const updatedValue = merge({}, currentValue, newValue)
