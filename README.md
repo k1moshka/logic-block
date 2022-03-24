@@ -1,6 +1,6 @@
 # LOGIC BLOCK
 
-**v1.1.2**
+**v1.2.1**
 
 
 Logic block is a JavaScript library for bundling bussiness logic of your data to common containers called blocks.
