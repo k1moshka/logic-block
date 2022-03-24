@@ -5,7 +5,7 @@ import memoHandler from '../memoHandler'
 describe('memoHandler works as expected', () => {
 
   test('memoHandler detects only fields in config', () => {
-    const fn = jest.fn(() => {})
+    const fn = jest.fn(() => { })
     const block = Block({
       a: value(1),
       b1: {
@@ -22,7 +22,7 @@ describe('memoHandler works as expected', () => {
   })
 
   test('memoHandler work only if target fields were updated', () => {
-    const fn = jest.fn(() => {})
+    const fn = jest.fn(() => { })
     const block = Block({
       a: value(1),
       b1: {
@@ -78,6 +78,22 @@ describe('memoHandler works as expected', () => {
     const result = instance({ a: { b: true } })
 
     expect(result).toEqual({ a: { b: true, c: 2 } })
+  })
+
+  test('memoHandler self invokes when should update value', () => {
+    const memoFn = jest.fn((a, update) => {
+      if (a === 1 || a === 2) {
+        update({ a: a + 1 })
+      }
+    })
+    const b = Block({
+      a: value(1)
+    }, memoHandler(memoFn, ['a']))
+    const instance = b()
+    const res = instance()
+
+    expect(res).toEqual({ a: 3 })
+    expect(memoFn.mock.calls.length).toBe(3)
   })
 
 })

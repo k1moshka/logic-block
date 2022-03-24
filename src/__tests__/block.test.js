@@ -509,6 +509,60 @@ describe('Block handler', () => {
     expect(res).toEqual({ update: true, n1: { a: 2 }, n2: { b: 2 } })
   })
 
+
+  test('should async increment handler updates work properly', async () => {
+    return new Promise((resolve) => {
+      const b1 = Block({
+        upd: value(false),
+        a: value(0)
+      }, memoHandler((upd, update) => {
+        if (upd) {
+          setTimeout(() => {
+            update({ a: 50 })
+          }, 100)
+        }
+      }, ['upd']))
+
+      const b2 = Block({
+        upd: value(false),
+        b: value(0)
+      }, memoHandler((upd, update) => {
+        if (upd) {
+          setTimeout(() => {
+            update({ b: 100 })
+          }, 200)
+        }
+      }, ['upd']))
+
+      const block = Block({
+        update: value(false),
+
+        b1,
+        b2
+      }, memoHandler((upd, update) => {
+        if (upd) {
+          update({ b1: { upd } })
+          update({ b2: { upd } })
+        }
+      }, ['update']))
+
+      let v
+      const instance = block(undefined, {
+        handleUpdate: (newValue) => {
+          v = newValue
+        }
+      })
+      instance()
+      instance({ update: true })
+
+      setTimeout(() => {
+        expect(v).toEqual({ update: true, b1: { upd: true, a: 50 }, b2: { upd: true, b: 100 } })
+
+        resolve()
+      }, 500)
+    })
+  })
+
   // TODO: implement it
   // test('Really deep nested blocks with updates', () => {
   // })
