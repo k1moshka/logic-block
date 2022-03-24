@@ -5,22 +5,18 @@ export default function composeHandlers(...handlersOrFunctions: Array<BlockHandl
     const handlers = handlersOrFunctions.map(h => isHandler(h) ? h() : h)
 
     return (value, update, oldValue) => {
-      let breakChain = false
+      let prevValue = oldValue
+      let nextValue = value
 
       const patchedUpdate = (newValue) => {
-        const nextValue = update(newValue)
-
-        breakChain = true
+        oldValue = nextValue
+        nextValue = update(newValue)
 
         return nextValue
       }
 
       for (let handler of handlers) {
-        handler(value, patchedUpdate, oldValue)
-
-        if (breakChain) {
-          return
-        }
+        handler(nextValue, patchedUpdate, prevValue)
       }
     }
   })
