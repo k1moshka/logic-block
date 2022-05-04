@@ -59,7 +59,18 @@ export const Block = (scheme: Object, handlerFn: BlockHandler): BlockFactory => 
       // parentHandler - isntance of parent handler
       handlerInstance.wrapParentHandler(parentHandlerInstance, path)
 
-      const updatedValue = merge({}, currentValue, newValue)
+      let newValueSlice
+      if (typeof newValue === 'function') {
+        newValueSlice = newValue(currentValue)
+      } else {
+        newValueSlice = newValue
+      }
+
+      if (typeof newValueSlice !== 'object' && typeof newValueSlice !== 'undefined') {
+        throw new Error('BlockInstance newValue argument should be an undefined value or an object or a function which returns object with only updated values')
+      }
+
+      const updatedValue = merge({}, currentValue, newValueSlice)
       let result = renderScheme(updatedValue, currentValue)
 
       let step = 0

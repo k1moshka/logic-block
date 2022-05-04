@@ -1,6 +1,6 @@
 # LOGIC BLOCK
 
-**v1.2.2**
+**v1.3.0**
 
 
 Logic block is a JavaScript library for bundling bussiness logic of your data to common containers called blocks.
@@ -96,9 +96,9 @@ BlockInstance is a function that takes changes in data and provide as a result c
 
 You get BlockInstance on every call of BlockFactory.
 
-| Argument      | Type     | Optional? | Description                                                                                                                                                       |
-| ------------- | -------- | --------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| changedValues | `Object` | Optional  | Object that is slice of data, but it usually contains only changed values. If you don't provide this argument, BlockInstance will process data with current value |
+| Argument      | Type                              | Optional? | Description                                                                                                                                                                                                                                                                                                                                                                            |
+| ------------- | --------------------------------- | --------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| changedValues | `Object` or `(Object?) => Object` | Optional  | `Object` or `Function` which returns object that is containing slice of data, but it usually contains only changed values. If you don't provide this argument, BlockInstance will process data with current value. In case of passing `Function`, the function will apply as argument current value of instance, and must return object or undefined otherwise it throws the `Error` |
 
 
 ### **wrapHandler**

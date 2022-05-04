@@ -7,6 +7,7 @@ import { createHandler } from '../handler'
 import { value } from '../reducers'
 import composeHandlers from '../composeHandlers'
 
+
 describe('Block rendering', () => {
   test('do values setups immediately while processing new value from scheme', () => {
     const fn = jest.fn(() => { return 1 })
@@ -239,6 +240,51 @@ describe('Block updating', () => {
     })
   })
 })
+
+
+describe('Block updating via function', () => {
+  test('Block update function takes current value', () => {
+    const block = Block({
+      a: value(1)
+    })
+
+    const instance = block()
+    const updaterFunc = jest.fn(() => { return {} })
+    instance(updaterFunc)
+    instance(updaterFunc)
+    instance({ a: 33 })
+    instance(updaterFunc)
+
+    expect(updaterFunc.mock.calls.length).toBe(3)
+    expect(updaterFunc.mock.calls[0][0]).toBeUndefined()
+    expect(updaterFunc.mock.calls[1][0]).toEqual(
+      expect.objectContaining({
+        a: 1
+      })
+    )
+    expect(updaterFunc.mock.calls[2][0]).toEqual(
+      expect.objectContaining({
+        a: 33
+      })
+    )
+  })
+
+  test('Block update function can provide new values', () => {
+    const block = Block({
+      a: value(1)
+    })
+
+    const instance = block()
+    const increment = ({ a }) => ({ a: a + 1 })
+    instance()
+    const { a: a1 } = instance(increment)
+    const { a: a2 } = instance(increment)
+
+    expect(a1).toBe(2)
+    expect(a2).toBe(3)
+  })
+})
+
 
 describe('Block instance options', () => {
   test('Block handleUpdate works well', () => {
