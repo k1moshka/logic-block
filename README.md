@@ -1,9 +1,9 @@
 # LOGIC BLOCK
 
-**v1.3.0**
+**v1.4.0**
 
 
-Logic block is a JavaScript library for bundling bussiness logic of your data to common containers called blocks.
+Logic block is a JavaScript/Typescript library for bundling bussiness logic of your data to common containers called blocks.
 
 Features:
 * **Declarative** - defining your logic (or block) as simple as defining object in JS
