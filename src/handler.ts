@@ -1,6 +1,10 @@
+type RecursivePartial<T> = {
+  [P in keyof T]?: RecursivePartial<T[P]>;
+};
+
 export type UpdateFunction<
   TBlockValue = Record<string, any>
-> = (updatedFields: Partial<TBlockValue>) => TBlockValue;
+> = (updatedFields: RecursivePartial<TBlockValue>) => TBlockValue;
 
 export type HandlerInstance<TBlockValue = Record<string, any>> = {
   getPath: () => string;
