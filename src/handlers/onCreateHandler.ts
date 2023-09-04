@@ -1,13 +1,11 @@
-import { HandlerFunction, UpdateFunction, wrapHandler } from "../handler";
+import { HandlerFunction, wrapHandler } from "../handler";
 
-const onCreateHandler = (fn: HandlerFunction) =>
-  wrapHandler(() => {
+const onCreateHandler = <TBlockValue = Record<string, any>>(
+  fn: HandlerFunction<TBlockValue>
+) =>
+  wrapHandler<TBlockValue>(() => {
     let run = false;
-    return (
-      value: Record<string, any>,
-      update: UpdateFunction,
-      oldValue: Record<string, any>
-    ) => {
+    return (value, update, oldValue) => {
       if (run) {
         return;
       }

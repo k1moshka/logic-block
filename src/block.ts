@@ -40,7 +40,7 @@ export const isBlock = (test) => test.__block === true;
 
 export const Block = <T = Record<string, any>, TScheme = Record<string, any>>(
   scheme: TScheme,
-  handlerFn?: BlockHandler
+  handlerFn?: BlockHandler<T>
 ): BlockFactory<T, TScheme> => {
   // handlerFn - handler that defines in definition-time
   let handlerFactory;

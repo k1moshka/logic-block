@@ -1,19 +1,24 @@
-export type UpdateFunction<T = Record<string, any>> = (
-  updatedFields: Partial<T>
-) => T;
+export type UpdateFunction<
+  TBlockValue = Record<string, any>
+> = (updatedFields: Partial<TBlockValue>) => TBlockValue;
 
-export type HandlerInstance<T = Record<string, any>> = {
+export type HandlerInstance<TBlockValue = Record<string, any>> = {
   getPath: () => string;
-  wrapParentHandler: (parent: HandlerInstance<T>, path: string) => void;
-  invoke: (newValue: T, oldValue: T) => T;
-  updateWithValue: (path: string, valueAtPath: T) => T;
+  wrapParentHandler: (
+    parent: HandlerInstance<TBlockValue>,
+    path: string
+  ) => void;
+  invoke: (newValue: TBlockValue, oldValue: TBlockValue) => TBlockValue;
+  updateWithValue: (path: string, valueAtPath: TBlockValue) => TBlockValue;
 };
 
-export type HandlerFunction<T = Record<string, any>> = (
-  value: T,
-  update: UpdateFunction,
-  oldValue: T
-) => Promise<void> | void;
+export type HandlerFunctionResult = Promise<void> | void;
+
+export type HandlerFunction<TBlockValue = Record<string, any>> = (
+  value: TBlockValue,
+  update: UpdateFunction<TBlockValue>,
+  oldValue: TBlockValue
+) => HandlerFunctionResult;
 export type BlockHandler<T = Record<string, any>> = {
   (): HandlerFunction<T>;
   __block_handler: boolean;
@@ -21,16 +26,15 @@ export type BlockHandler<T = Record<string, any>> = {
 
 export const isHandler = (test: any) => test && test.__block_handler === true;
 
-// TODO: wrapHandler should use inside () => (value, update, oldValue) => Promise<any> | void
-export const wrapHandler = <T = Record<string, any>>(
-  handler: () => HandlerFunction<T>
-): BlockHandler<T> => {
-  const returnHandler = handler.bind({});
+export const wrapHandler = <TBlockValue = Record<string, any>>(
+  handler: () => HandlerFunction<TBlockValue>
+): BlockHandler<TBlockValue> => {
+  const returnHandler: BlockHandler<TBlockValue> = handler.bind({});
   returnHandler.__block_handler = true;
 
   return returnHandler;
 };
 
-export const createHandler = <T = Record<string, any>>(
-  fn: HandlerFunction<T>
-): BlockHandler<T> => wrapHandler<T>(() => fn);
+export const createHandler = <TBlockValue = Record<string, any>>(
+  fn: HandlerFunction<TBlockValue>
+): BlockHandler<TBlockValue> => wrapHandler<TBlockValue>(() => fn);

@@ -67,3 +67,17 @@ test("memo should work on initial render with block initial data properly", () =
   expect(fn.mock.calls.length).toBe(1);
   expect(result).toEqual({ a: 2, m: 3 });
 });
+
+test("memo's reducer function can get current value", () => {
+  const fn = jest.fn((a, currentValue) => a + 1);
+  const block = Block({
+    a: value(1),
+    m: memo<number, [number, number]>(fn, ["a"]),
+  });
+
+  const instance = block({ a: 2 });
+  instance();
+  instance({ a: 3 });
+
+  expect(fn.mock.calls[1][1]).toBe(3);
+})

@@ -228,7 +228,7 @@ const result = instance({ sections: updateArray(1, { title: 'scrap booking link'
 ```javascript
 Block({
   a: value(1),
-  b: fields(a => a + 1, ['a'])
+  b: fields((a, currentValue, currentBlockValue) => a + 1, ['a'])
 })
 ```
 3. `memo(reducerFn: Function, dependencies: Array<string>)` - the same behaviour as in `fields`, except that reducerFn, will run
@@ -238,7 +238,7 @@ Block({
 const block = Block({
   html: value(''),
   version: value(1),
-  formattedMessage: memo(html => reallyHardLogicForHandlingHTML(html), ['html'])
+  formattedMessage: memo((html, currentValue, currentBlockValue) => reallyHardLogicForHandlingHTML(html), ['html'])
 })
 
 // here the formatted message will handled by reducer
@@ -281,6 +281,12 @@ const block = Block({
 }, ['type']))
 ```
 
+#### Using memoHandler with typescript
+You need to provide all the generic types explicitly.
+```typescript
+type BlockValues = { ... };
+Block<BlockValues>({ ... }, memoHandler<BlockValues, [number, ...]>(() => {}, ['someNumberDep', ...]))
+```
 
 2. `onCreateHandler(handlerFn: (value, update, oldValue) => void)` - this handler run the `handlerFn` only when new instance was created
 

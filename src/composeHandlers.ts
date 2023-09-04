@@ -5,10 +5,10 @@ import {
   HandlerFunction,
 } from "./handler";
 
-export default function composeHandlers(
-  ...handlersOrFunctions: Array<BlockHandler | HandlerFunction>
-): BlockHandler {
-  return wrapHandler(() => {
+export default function composeHandlers<TBlockValue = Record<string, any>>(
+  ...handlersOrFunctions: Array<BlockHandler<TBlockValue> | HandlerFunction<TBlockValue>>
+) {
+  return wrapHandler<TBlockValue>(() => {
     const handlers = handlersOrFunctions.map((h) =>
       isHandler(h) ? (h as BlockHandler)() : h
     );

@@ -4,9 +4,10 @@ import { createFieldReducer } from "../createFieldReducer";
 
 export type FieldsReducerFunction<
   T = any,
-  TDepValues extends Array<any> = Array<any>
+  TDepValues extends Array<any> = Array<any>,
+  TBlockValue = Record<string, any>
 > = (
-  ...args: [...depsValues: TDepValues, fieldPath: string, fieldValue: any]
+  ...args: [...depsValues: TDepValues, fieldValue: T, blockValue: TBlockValue]
 ) => T;
 
 const fields = <
@@ -14,7 +15,7 @@ const fields = <
   TDepValues extends Array<any> = Array<any>,
   TBlockValue = Record<string, any>
 >(
-  reduceFn: FieldsReducerFunction<T, TDepValues>,
+  reduceFn: FieldsReducerFunction<T, TDepValues, TBlockValue>,
   deps: Array<string>
 ) =>
   createFieldReducer<T, TBlockValue>((value, _, path) => {

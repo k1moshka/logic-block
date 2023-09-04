@@ -14,7 +14,7 @@ export type FieldReducerInstance<T = any, TBlockValue = Record<string, any>> = F
 };
 
 export const createFieldReducer = <T = any, TBlockValue = Record<string, any>>(
-  reducerFn: FieldReducerFunction
+  reducerFn: FieldReducerFunction<T, TBlockValue>
 ) => {
   const fieldReducer: FieldReducerInstance<T, TBlockValue> = (
     newValue,
