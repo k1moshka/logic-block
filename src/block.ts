@@ -3,12 +3,15 @@ import { createHandlerFactory } from "./internal/createHandlerFactory";
 import { merge } from "./internal/merge";
 import { BlockHandler, wrapHandler, HandlerInstance } from "./handler";
 
+export type RecursivePartial<T> = {
+  [P in keyof T]?: RecursivePartial<T[P]>;
+};
 export type BlockInstanceOptions<T = Record<string, any>> = {
   handleUpdate?: (newValue: T) => void;
 };
 export type BlockInstanceUpdatedFields<T = Record<string, any>> =
-  | Partial<T>
-  | ((value: T) => Partial<T>);
+  | RecursivePartial<T>
+  | ((value: T) => RecursivePartial<T>);
 export type BlockInstance<T = Record<string, any>> = {
   (
     updatedFields?: BlockInstanceUpdatedFields<T>,

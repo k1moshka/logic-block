@@ -1,6 +1,4 @@
-type RecursivePartial<T> = {
-  [P in keyof T]?: RecursivePartial<T[P]>;
-};
+import { RecursivePartial } from "./block";
 
 export type UpdateFunction<
   TBlockValue = Record<string, any>
