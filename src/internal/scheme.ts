@@ -50,7 +50,7 @@ export const SchemeRenderer = (
           } else {
             setPath(result, fullPath, entry());
           }
-        } else if (typeof entry === "object") {
+        } else if (typeof entry === "object" && entry !== null) {
           if (Array.isArray(entry)) {
             entry.forEach(() => renderSchemePart(entry, key));
           } else {
