@@ -9,7 +9,7 @@ const memo = <
   TDepValues extends Array<any> = Array<any>,
   TBlockValue = Record<string, any>
 >(
-  reduceFn: FieldsReducerFunction<T, TDepValues>,
+  reduceFn: FieldsReducerFunction<T, TDepValues, TBlockValue>,
   deps: Array<string>
 ) =>
   createFieldReducer<T, TBlockValue>((value, oldValue, path, parentHandlerInstance) => {
