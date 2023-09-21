@@ -1,8 +1,10 @@
 import { RecursivePartial } from "./block";
 
-export type UpdateFunction<
-  TBlockValue = Record<string, any>
-> = (updatedFields: RecursivePartial<TBlockValue>) => TBlockValue;
+export type UpdateFunction<TBlockValue = Record<string, any>> = (
+  updatedFields:
+    | RecursivePartial<TBlockValue>
+    | ((value: TBlockValue) => RecursivePartial<TBlockValue>)
+) => TBlockValue;
 
 export type HandlerInstance<TBlockValue = Record<string, any>> = {
   getPath: () => string;
