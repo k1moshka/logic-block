@@ -1,11 +1,11 @@
 {
   "name": "logic-block",
-  "version": "1.4.6",
+  "version": "1.5.0",
   "description": "JavaScript/Typescript library for bundling bussiness logic of your data to common containers called blocks",
   "main": "lib/index.js",
   "scripts": {
     "test": "npx jest",
-    "build": "npx tsc"
+    "build": "rollup -c"
   },
   "files": [
     "lib"
@@ -43,8 +43,12 @@
     "babel-eslint": "^10.1.0",
     "babel-jest": "^27.0.2",
     "babel-preset-jest": "^27.0.1",
+    "esbuild": "^0.19.5",
     "eslint": "^7.28.0",
     "jest": "^27.0.4",
+    "rollup": "^4.2.0",
+    "rollup-plugin-dts": "^6.1.0",
+    "rollup-plugin-esbuild": "^6.1.0",
     "typescript": "^4.7.4"
   }
 }
